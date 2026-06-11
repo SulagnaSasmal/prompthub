@@ -1,0 +1,39 @@
+site_name: PromptHub Documentation
+site_description: Enterprise Prompt Management System — user guide, admin guide, architecture, API reference, and more
+site_author: Sulagna Sasmal
+repo_url: https://github.com/SulagnaSasmal/prompthub
+repo_name: SulagnaSasmal/prompthub
+
+theme:
+  name: material
+  palette:
+    primary: blue
+    accent: indigo
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - search.suggest
+    - content.code.copy
+
+nav:
+  - Home: index.md
+  - User Guide: user-guide.md
+  - Admin Guide: admin-guide.md
+  - Prompt Design Standards: prompt-design-standards.md
+  - Architecture: architecture.md
+  - API Reference: api-reference.md
+  - FAQ: faq.md
+  - Release Notes: release-notes.md
+
+plugins:
+  - search
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight
+  - tables
+  - toc:
+      permalink: true
