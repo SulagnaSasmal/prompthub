@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.core.config import settings
 from app.core.database import Base, engine
 from app.routers import auth, audit, dashboard, evaluations, governance, prompts, tests, versions
 
@@ -15,10 +16,12 @@ app = FastAPI(
     openapi_url="/api/openapi.json",
 )
 
+_origins = ["*"] if settings.cors_origins.strip() == "*" else [o.strip() for o in settings.cors_origins.split(",")]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
-    allow_credentials=True,
+    allow_origins=_origins,
+    allow_credentials=_origins != ["*"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
