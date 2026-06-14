@@ -5,6 +5,26 @@ function getToken(): string | null {
   return localStorage.getItem("token");
 }
 
+function clearSession() {
+  if (typeof window === "undefined") return;
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+}
+
+function parseErrorMessage(detail: unknown): string {
+  if (typeof detail === "string") return detail;
+  if (Array.isArray(detail)) {
+    return detail
+      .map((item) => {
+        if (item && typeof item === "object" && "msg" in item) return String(item.msg);
+        return JSON.stringify(item);
+      })
+      .join(", ");
+  }
+  if (detail && typeof detail === "object") return JSON.stringify(detail);
+  return "Request failed";
+}
+
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const token = getToken();
   const headers: Record<string, string> = {
@@ -16,7 +36,8 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const res = await fetch(`${BASE}${path}`, { ...options, headers });
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: res.statusText }));
-    throw new Error(JSON.stringify(err.detail ?? err));
+    if (res.status === 401) clearSession();
+    throw new Error(parseErrorMessage(err.detail ?? err));
   }
   if (res.status === 204) return undefined as T;
   return res.json();

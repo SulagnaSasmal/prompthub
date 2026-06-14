@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import type { Prompt } from "@/lib/types";
@@ -23,7 +24,6 @@ export default function LibraryPage() {
     if (status !== "All") params.status = status;
     if (risk !== "All") params.risk_level = risk;
 
-    setLoading(true);
     api.prompts
       .list(params)
       .then(setPrompts)
@@ -46,12 +46,12 @@ export default function LibraryPage() {
           <h2 className="text-2xl font-bold text-slate-900">Prompt Library</h2>
           <p className="text-sm text-slate-500 mt-0.5">{filtered.length} prompts</p>
         </div>
-        <a
+        <Link
           href="/prompts/new"
           className="bg-brand-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-700 transition-colors"
         >
           + New Prompt
-        </a>
+        </Link>
       </div>
 
       {/* Filters */}

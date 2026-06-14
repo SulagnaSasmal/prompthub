@@ -1,8 +1,7 @@
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import Column, Integer, Numeric, ForeignKey, TIMESTAMP, CheckConstraint
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import CheckConstraint, Column, ForeignKey, Integer, Numeric, TIMESTAMP, Uuid
 from sqlalchemy.orm import relationship
 
 from app.core.database import Base
@@ -11,8 +10,8 @@ from app.core.database import Base
 class Evaluation(Base):
     __tablename__ = "evaluations"
 
-    evaluation_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    version_id = Column(UUID(as_uuid=True), ForeignKey("versions.version_id"), nullable=False)
+    evaluation_id = Column(Uuid(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    version_id = Column(Uuid(as_uuid=True), ForeignKey("versions.version_id"), nullable=False)
     run_number = Column(Integer, nullable=False)
     accuracy_score = Column(Integer, nullable=False)
     completeness_score = Column(Integer, nullable=False)
@@ -20,7 +19,7 @@ class Evaluation(Base):
     hallucination_score = Column(Integer, nullable=False)
     formatting_score = Column(Integer, nullable=False)
     overall_score = Column(Numeric(5, 2))
-    evaluated_by = Column(UUID(as_uuid=True), ForeignKey("users.user_id"), nullable=False)
+    evaluated_by = Column(Uuid(as_uuid=True), ForeignKey("users.user_id"), nullable=False)
     evaluated_at = Column(TIMESTAMP(timezone=True), default=lambda: datetime.now(timezone.utc))
 
     __table_args__ = (

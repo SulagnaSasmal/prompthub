@@ -10,7 +10,7 @@ class PromptCreate(BaseModel):
     description: str
     category: str
     subcategory: str
-    owner_id: UUID
+    owner_id: UUID | None = None
     target_model: str
     risk_level: str = "Medium"
     tags: List[str] = []

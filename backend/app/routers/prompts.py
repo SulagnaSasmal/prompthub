@@ -45,8 +45,10 @@ def create_prompt(
 ):
     if db.query(Prompt).filter(Prompt.name.ilike(body.name)).first():
         raise HTTPException(status_code=400, detail="Prompt name already exists")
+    payload = body.model_dump()
+    payload["owner_id"] = payload["owner_id"] or current_user.user_id
     prompt = Prompt(
-        **body.model_dump(),
+        **payload,
         created_by=current_user.user_id,
         status="Draft",
     )
