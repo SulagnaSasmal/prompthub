@@ -912,4 +912,4 @@ def seed():
 if __name__ == "__main__":
     print("Seeding PromptHub catalog...")
     seed()
-    print("Done. 25 enterprise prompts loaded.")
+    print("Done. PromptHub catalog seed complete.")
