@@ -21,15 +21,59 @@ export default function ReviewQueuePage() {
   const [items, setItems] = useState<ReviewQueueItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
   const [section, setSection] = useState("All");
 
+  async function load() {
+    const nextItems = await api.workflows.reviewQueue();
+    setItems(nextItems);
+  }
+
   useEffect(() => {
+    let isActive = true;
+
     api.workflows
       .reviewQueue()
-      .then(setItems)
-      .catch((err) => setError(err instanceof Error ? err.message : "Could not load review queue"))
-      .finally(() => setLoading(false));
+      .then((nextItems) => {
+        if (isActive) setItems(nextItems);
+      })
+      .catch((err) => {
+        if (isActive) setError(err instanceof Error ? err.message : "Could not load review queue");
+      })
+      .finally(() => {
+        if (isActive) setLoading(false);
+      });
+
+    return () => {
+      isActive = false;
+    };
   }, []);
+
+  async function transition(item: ReviewQueueItem, toStatus: string) {
+    setError("");
+    setMessage("");
+    try {
+      await api.versions.transition(item.version_id, toStatus, `Review Queue action: ${item.status} to ${toStatus}`);
+      setMessage(`${item.workflow_name} moved to ${toStatus}.`);
+      await load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not transition workflow");
+    }
+  }
+
+  function nextStatus(item: ReviewQueueItem): string | null {
+    if (item.status === "In Review") return "Testing";
+    if (item.status === "Testing") return "Approved";
+    if (item.status === "Approved") return "Production";
+    return null;
+  }
+
+  function returnStatus(item: ReviewQueueItem): string | null {
+    if (item.status === "In Review") return "Draft";
+    if (item.status === "Testing") return "In Review";
+    if (item.status === "Approved") return "Testing";
+    return null;
+  }
 
   const filtered = useMemo(
     () => (section === "All" ? items : items.filter((item) => item.queue_section === section)),
@@ -72,6 +116,7 @@ export default function ReviewQueuePage() {
       </div>
 
       {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+      {message && <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{message}</p>}
 
       {loading ? (
         <div className="h-56 animate-pulse rounded-lg border border-slate-200 bg-white" />
@@ -110,9 +155,21 @@ export default function ReviewQueuePage() {
                   <td className="max-w-sm px-4 py-3 text-slate-600">{item.missing_requirements.join(", ") || "None"}</td>
                   <td className="px-4 py-3 text-slate-500">{new Date(item.last_activity).toLocaleString()}</td>
                   <td className="px-4 py-3">
-                    <Link href={`/prompts/${item.prompt_id}`} className="rounded-lg bg-slate-900 px-3 py-2 text-xs font-semibold text-white">
-                      {item.primary_action}
-                    </Link>
+                    <div className="flex flex-wrap gap-2">
+                      <Link href={`/prompts/${item.prompt_id}`} className="rounded-lg border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-700">
+                        Open
+                      </Link>
+                      {nextStatus(item) && (
+                        <button onClick={() => transition(item, nextStatus(item)!)} className="rounded-lg bg-slate-900 px-3 py-2 text-xs font-semibold text-white">
+                          {item.primary_action}
+                        </button>
+                      )}
+                      {returnStatus(item) && (
+                        <button onClick={() => transition(item, returnStatus(item)!)} className="rounded-lg border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-700">
+                          Return
+                        </button>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}

@@ -1,4 +1,6 @@
+import csv
 import hashlib
+import io
 import json
 import re
 from urllib.parse import urlparse
@@ -773,7 +775,12 @@ def diff_openapi_sources(
 
 
 @router.post("/runs/{run_id}/export", response_model=RunExportOut)
-def export_run_markdown(run_id: UUID, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+def export_run(
+    run_id: UUID,
+    target_type: str = Query("markdown"),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
     run = (
         db.query(Run)
         .options(selectinload(Run.version).selectinload(Version.prompt))
@@ -786,22 +793,57 @@ def export_run_markdown(run_id: UUID, db: Session = Depends(get_db), current_use
     if run.run_by != current_user.user_id and not roles.intersection({"reviewer", "approver"}):
         raise HTTPException(status_code=403, detail="You can only export your own runs")
     workflow_name = run.version.prompt.name
-    content = (
-        f"# {workflow_name}\n\n"
-        f"- Version: {run.version.version_number}\n"
-        f"- Model: {run.model}\n"
-        f"- Governance result: {run.governance_result}\n"
-        f"- Created: {run.created_at.isoformat()}\n\n"
-        "## Source Inputs\n\n"
-        + "\n".join(f"### {key}\n\n{value}\n" for key, value in run.input_payload.items())
-        + "\n## Output\n\n"
-        + (run.output_text or run.blocked_reason or "No output was generated.")
-        + "\n"
-    )
-    filename = f"{workflow_name.lower().replace(' ', '-')}-{str(run.run_id)[:8]}.md"
+    safe_name = workflow_name.lower().replace(" ", "-")
+    output_text = run.output_text or run.blocked_reason or "No output was generated."
+    if target_type == "markdown":
+        content = (
+            f"# {workflow_name}\n\n"
+            f"- Version: {run.version.version_number}\n"
+            f"- Model: {run.model}\n"
+            f"- Governance result: {run.governance_result}\n"
+            f"- Created: {run.created_at.isoformat()}\n\n"
+            "## Source Inputs\n\n"
+            + "\n".join(f"### {key}\n\n{value}\n" for key, value in run.input_payload.items())
+            + "\n## Output\n\n"
+            + output_text
+            + "\n"
+        )
+        filename = f"{safe_name}-{str(run.run_id)[:8]}.md"
+    elif target_type == "json":
+        content = json.dumps(
+            {
+                "run_id": str(run.run_id),
+                "workflow_name": workflow_name,
+                "version": run.version.version_number,
+                "model": run.model,
+                "governance_result": run.governance_result,
+                "created_at": run.created_at.isoformat(),
+                "inputs": run.input_payload,
+                "output": output_text,
+            },
+            indent=2,
+        )
+        filename = f"{safe_name}-{str(run.run_id)[:8]}.json"
+    elif target_type == "csv":
+        buffer = io.StringIO()
+        writer = csv.writer(buffer)
+        writer.writerow(["field", "value"])
+        writer.writerow(["run_id", str(run.run_id)])
+        writer.writerow(["workflow_name", workflow_name])
+        writer.writerow(["version", run.version.version_number])
+        writer.writerow(["model", run.model])
+        writer.writerow(["governance_result", run.governance_result])
+        writer.writerow(["created_at", run.created_at.isoformat()])
+        for key, value in run.input_payload.items():
+            writer.writerow([f"input.{key}", value])
+        writer.writerow(["output", output_text])
+        content = buffer.getvalue()
+        filename = f"{safe_name}-{str(run.run_id)[:8]}.csv"
+    else:
+        raise HTTPException(status_code=400, detail="target_type must be markdown, json, or csv")
     event = ExportEvent(
         run_id=run.run_id,
-        target_type="markdown",
+        target_type=target_type,
         target_reference=filename,
         exported_by=current_user.user_id,
         status="Exported",
@@ -813,10 +855,10 @@ def export_run_markdown(run_id: UUID, db: Session = Depends(get_db), current_use
         target_type="run",
         target_id=run.run_id,
         actor_id=current_user.user_id,
-        payload={"target_type": "markdown", "filename": filename},
+        payload={"target_type": target_type, "filename": filename},
     )
     db.commit()
-    return RunExportOut(run_id=run.run_id, filename=filename, target_type="markdown", content=content)
+    return RunExportOut(run_id=run.run_id, filename=filename, target_type=target_type, content=content)
 
 
 @router.get("/review-queue", response_model=list[ReviewQueueItemOut])

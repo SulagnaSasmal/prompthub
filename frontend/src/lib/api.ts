@@ -166,8 +166,8 @@ export const api = {
         method: "POST",
         body: JSON.stringify({ note }),
       }),
-    exportRun: (runId: string) =>
-      request<import("./types").RunExport>(`/runs/${runId}/export`, {
+    exportRun: (runId: string, targetType = "markdown") =>
+      request<import("./types").RunExport>(`/runs/${runId}/export?${new URLSearchParams({ target_type: targetType })}`, {
         method: "POST",
       }),
     publishRun: (runId: string, data: object) =>

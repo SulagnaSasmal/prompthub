@@ -3,8 +3,8 @@ import "./globals.css";
 import { AppShell } from "@/components/layout/AppShell";
 
 export const metadata: Metadata = {
-  title: "PromptHub — Enterprise Prompt Management",
-  description: "Version control, governance, and quality measurement for enterprise AI prompts",
+  title: "PromptHub - Governed Writing Workflows",
+  description: "Version control, governance, and quality measurement for enterprise writing workflows",
   icons: {
     icon: "/icon.svg",
   },

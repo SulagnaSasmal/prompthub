@@ -84,10 +84,10 @@ export default function AdminPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-2xl font-bold text-slate-900">Admin</h2>
-          <p className="mt-1 text-sm text-slate-500">Configure deployment webhooks for production prompt changes.</p>
+          <p className="mt-1 text-sm text-slate-500">Configure deployment webhooks for production workflow changes.</p>
         </div>
         <Link href="/prompts/new" className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700">
-          New prompt
+          New workflow
         </Link>
       </div>
 

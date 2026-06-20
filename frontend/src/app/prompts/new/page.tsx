@@ -45,7 +45,7 @@ export default function NewPromptPage() {
       });
       router.push(`/prompts/${prompt.prompt_id}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not create prompt");
+      setError(err instanceof Error ? err.message : "Could not create workflow");
     } finally {
       setLoading(false);
     }

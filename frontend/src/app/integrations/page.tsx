@@ -95,6 +95,14 @@ export default function IntegrationsPage() {
     }
   }
 
+  async function uploadIntegrationFile(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    setContent(await file.text());
+    setLocator(file.name);
+    setSource(file.name.endsWith(".json") || file.name.endsWith(".yaml") || file.name.endsWith(".yml") ? "openapi" : "markdown");
+  }
+
   return (
     <div className="max-w-6xl space-y-6">
       <div>
@@ -190,6 +198,7 @@ export default function IntegrationsPage() {
           <input value={locator} onChange={(event) => setLocator(event.target.value)} className="rounded-lg border border-slate-200 px-3 py-2 text-sm" placeholder="GitHub URL, Jira key, OpenAPI URL, or source reference" />
         </div>
         <textarea value={content} onChange={(event) => setContent(event.target.value)} className="mt-3 min-h-28 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" placeholder="Paste Markdown, Jira text, or OpenAPI content when not using a fetchable URL." />
+        <input type="file" accept=".md,.txt,.json,.yaml,.yml" onChange={uploadIntegrationFile} className="mt-3 block w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-600" />
         <button type="submit" className="mt-3 rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white">
           Fetch read-only source
         </button>

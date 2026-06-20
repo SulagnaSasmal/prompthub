@@ -132,17 +132,28 @@ export default function PromptDetailPage() {
     }
   }
 
-  async function exportMarkdown() {
+  async function exportRun(targetType: "markdown" | "json" | "csv") {
     if (!run) return;
-    const exported = await api.workflows.exportRun(run.run_id);
-    const blob = new Blob([exported.content], { type: "text/markdown;charset=utf-8" });
+    const exported = await api.workflows.exportRun(run.run_id, targetType);
+    const mime = targetType === "json" ? "application/json" : targetType === "csv" ? "text/csv" : "text/markdown";
+    const blob = new Blob([exported.content], { type: `${mime};charset=utf-8` });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
     link.download = exported.filename;
     link.click();
     URL.revokeObjectURL(url);
-    setMessage("Markdown export downloaded.");
+    setMessage(`${targetType.toUpperCase()} export downloaded.`);
+  }
+
+  async function uploadSourceFile(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const text = await file.text();
+    setIntegrationLocator(text);
+    const target = variables.find((v) => v.var_type === "source-reference") || variables[0];
+    if (target) setInputs((prev) => ({ ...prev, [target.name]: text }));
+    setMessage(`${file.name} loaded as source input.`);
   }
 
   async function fetchSource() {
@@ -298,6 +309,12 @@ export default function PromptDetailPage() {
                 </select>
                 <button onClick={fetchSource} className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700">Fetch</button>
               </div>
+              <input
+                type="file"
+                accept=".md,.txt,.json,.yaml,.yml"
+                onChange={uploadSourceFile}
+                className="mt-2 block w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-600"
+              />
               <textarea value={integrationLocator} onChange={(e) => setIntegrationLocator(e.target.value)} className="mt-2 min-h-20 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" placeholder="Paste Markdown or enter a Jira key, GitHub URL, or OpenAPI reference" />
             </div>
 
@@ -324,8 +341,14 @@ export default function PromptDetailPage() {
                 <button onClick={() => navigator.clipboard.writeText(run?.output_text || "")} className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700">
                   <Copy className="h-4 w-4" /> Copy
                 </button>
-                <button onClick={exportMarkdown} disabled={!run} className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 disabled:opacity-50">
+                <button onClick={() => exportRun("markdown")} disabled={!run} className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 disabled:opacity-50">
                   <Download className="h-4 w-4" /> Markdown
+                </button>
+                <button onClick={() => exportRun("json")} disabled={!run} className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 disabled:opacity-50">
+                  <Download className="h-4 w-4" /> JSON
+                </button>
+                <button onClick={() => exportRun("csv")} disabled={!run} className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 disabled:opacity-50">
+                  <Download className="h-4 w-4" /> CSV
                 </button>
                 <button onClick={() => promote("example")} disabled={!run?.output_text} className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 disabled:opacity-50">
                   <Save className="h-4 w-4" /> Example

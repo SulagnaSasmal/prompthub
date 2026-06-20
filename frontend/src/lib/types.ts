@@ -174,7 +174,7 @@ export interface OpenApiDiff {
 export interface RunExport {
   run_id: string;
   filename: string;
-  target_type: "markdown";
+  target_type: string;
   content: string;
 }
 

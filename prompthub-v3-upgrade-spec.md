@@ -946,11 +946,11 @@ This slice gives the biggest user-visible improvement without trying to build ev
 | GitHub integration | Done | Public read-only fetch for issues, PRs, commits, blobs/raw files, and repo summaries. |
 | Jira integration | Done | Jira Cloud issue fetch works when credentials are configured, with simulated fallback otherwise. |
 | OpenAPI integration | Done | Pasted specs, public URL pulls, and endpoint/method diff parsing are implemented. |
-| Markdown/file integration | Partial | Pasted Markdown works; file upload parser is pending. |
+| Markdown/file integration | Done | Pasted Markdown and `.md`, `.txt`, `.json`, `.yaml`, and `.yml` uploads are supported. |
 | Style profiles and terminology | Done | Rule creation, attachment, injection, and style check exist. |
 | Pull Request style check | Done |
 | Markdown export | Done |
-| JSON/CSV export | Partial |
+| JSON/CSV export | Done |
 | GitHub/Confluence/Jira publishing | Partial |
 | Review Queue | Done |
 | Deployment Center | Done |

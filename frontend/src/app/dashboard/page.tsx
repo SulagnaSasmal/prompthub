@@ -53,12 +53,12 @@ export default function DashboardPage() {
 
       {/* Stat cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label="Total Prompts" value={metrics.total_prompts} sub="excluding retired" />
+        <StatCard label="Total Workflows" value={metrics.total_prompts} sub="excluding retired" />
         <StatCard label="Approved" value={metrics.approved_prompts} sub="approved or production" />
         <StatCard
           label="Avg Quality Score"
           value={metrics.average_quality_score ? `${metrics.average_quality_score}%` : "—"}
-          sub="production prompts"
+          sub="production workflows"
         />
         <StatCard label="Open Flags" value={metrics.open_governance_flags} sub="governance flags" />
       </div>
@@ -66,7 +66,7 @@ export default function DashboardPage() {
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-lg border border-slate-200 p-5">
-          <h3 className="font-semibold text-slate-800 mb-4 text-sm">Prompts by Category</h3>
+          <h3 className="font-semibold text-slate-800 mb-4 text-sm">Workflows by Category</h3>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={categoryData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
               <XAxis dataKey="name" tick={{ fontSize: 11 }} />
@@ -96,7 +96,7 @@ export default function DashboardPage() {
       {/* Tables */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-lg border border-slate-200 p-5">
-          <h3 className="font-semibold text-slate-800 mb-3 text-sm">Most Viewed Prompts</h3>
+          <h3 className="font-semibold text-slate-800 mb-3 text-sm">Most Viewed Workflows</h3>
           <table className="w-full text-sm">
             <thead>
               <tr className="text-xs text-slate-500 border-b border-slate-100">
@@ -130,7 +130,7 @@ export default function DashboardPage() {
           <h3 className="font-semibold text-slate-800 mb-3 text-sm">Library Summary</h3>
           <dl className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <dt className="text-slate-500">Retired prompts</dt>
+              <dt className="text-slate-500">Retired workflows</dt>
               <dd className="font-medium text-slate-800">{metrics.retired_prompts}</dd>
             </div>
             <div className="flex justify-between">

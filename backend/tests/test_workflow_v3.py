@@ -89,6 +89,12 @@ def test_v3_integrations_review_queue_and_markdown_export(client):
     assert export_resp.status_code == 200
     assert export_resp.json()["filename"].endswith(".md")
     assert "## Output" in export_resp.json()["content"]
+    json_export_resp = client.post(f"/api/v1/runs/{run_id}/export?target_type=json", headers=_headers(token))
+    assert json_export_resp.status_code == 200
+    assert json_export_resp.json()["filename"].endswith(".json")
+    csv_export_resp = client.post(f"/api/v1/runs/{run_id}/export?target_type=csv", headers=_headers(token))
+    assert csv_export_resp.status_code == 200
+    assert csv_export_resp.json()["filename"].endswith(".csv")
 
     compare_resp = client.get(
         f"/api/v1/runs/compare/{run_id}/{second_run_resp.json()['run_id']}",

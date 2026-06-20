@@ -24,6 +24,7 @@ nav:
   - Architecture: architecture.md
   - API Reference: api-reference.md
   - GitHub Action: github-action.md
+  - Testing Plan: testing-plan.md
   - FAQ: faq.md
   - Release Notes: release-notes.md
 
