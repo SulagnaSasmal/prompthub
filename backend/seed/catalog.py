@@ -22,6 +22,7 @@ from app.models.evaluation import Evaluation
 from app.models.test_case import TestCase
 from app.models.governance import GovernanceCheck
 from app.models.workflow_log import WorkflowLog
+from app.models.workflow_v2 import Example, Variable
 
 Base.metadata.create_all(bind=engine)
 
@@ -576,6 +577,51 @@ PROMPTS_DATA = [
 ]
 
 
+def _task_type(prompt_name: str, subcategory: str) -> str:
+    text = f"{prompt_name} {subcategory}".lower()
+    if "release" in text or "changelog" in text or "what's new" in text:
+        return "Release Notes"
+    if "api" in text:
+        return "API Summary"
+    if "installation" in text:
+        return "Migration Guide"
+    if "knowledge base" in text or "kb" in text:
+        return "KB Article"
+    if "tone" in text or "email" in text:
+        return "Tone Rewrite"
+    if "bias" in text or "policy" in text or "compliance" in text:
+        return "Style Check"
+    return "Documentation Draft"
+
+
+def _ensure_runnable_seed(db, prompt: Prompt, version: Version):
+    prompt.task_type = _task_type(prompt.name, prompt.subcategory)
+    prompt.usage_notes = prompt.usage_notes or f"Use this workflow for {prompt.subcategory.lower()} writing tasks."
+    if "{{source_material}}" not in version.prompt_text:
+        version.prompt_text = f"{version.prompt_text}\n\nSource material:\n{{{{source_material}}}}"
+    if not version.variables:
+        db.add(
+            Variable(
+                version_id=version.version_id,
+                name="source_material",
+                label="Source material",
+                help_text="Paste the Jira ticket, Markdown, diff, ticket thread, or source notes to transform.",
+                var_type="source-reference",
+                required=True,
+                example_value=f"Sample source material for {prompt.name}",
+            )
+        )
+    if not version.examples:
+        db.add(
+            Example(
+                version_id=version.version_id,
+                input_payload={"source_material": f"Sample source material for {prompt.name}."},
+                output_text=f"Example output for {prompt.name}: concise, accurate, and ready for documentation review.",
+                note="Seeded good-output example for the v2 runnable workflow library.",
+            )
+        )
+
+
 def seed():
     db = SessionLocal()
     try:
@@ -649,6 +695,7 @@ def seed():
                 if is_last:
                     prompt.current_version = vd["number"]
                     prompt.status = "Production"
+                    _ensure_runnable_seed(db, prompt, v)
 
                     # Add evaluations (3 runs)
                     base_scores = {
@@ -726,6 +773,12 @@ def seed():
 
             db.commit()
             print(f"  Seeded: {pd['name']} ({len(pd['versions'])} version(s))")
+
+        for prompt in db.query(Prompt).all():
+            current = next((v for v in prompt.versions if v.version_number == prompt.current_version), None)
+            if current:
+                _ensure_runnable_seed(db, prompt, current)
+        db.commit()
 
     finally:
         db.close()

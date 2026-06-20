@@ -20,7 +20,7 @@ export function ScoreCard({ evaluation }: { evaluation: Evaluation }) {
   const overallColor = overall >= 85 ? "text-emerald-600" : overall >= 70 ? "text-yellow-600" : "text-red-600";
 
   return (
-    <div className="bg-white border border-slate-200 rounded-xl p-5">
+    <div className="bg-white border border-slate-200 rounded-lg p-5">
       <div className="flex items-center justify-between mb-4">
         <h4 className="font-semibold text-slate-800">Evaluation Run #{evaluation.run_number}</h4>
         <div className={`text-2xl font-bold ${overallColor}`}>{overall.toFixed(1)}%</div>

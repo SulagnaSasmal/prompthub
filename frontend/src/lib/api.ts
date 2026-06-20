@@ -115,6 +115,72 @@ export const api = {
   dashboard: {
     metrics: () => request<import("./types").DashboardMetrics>("/dashboard/metrics"),
   },
+  workflows: {
+    variables: (versionId: string) =>
+      request<import("./types").Variable[]>(`/versions/${versionId}/variables`),
+    saveVariables: (versionId: string, data: object[]) =>
+      request<import("./types").Variable[]>(`/versions/${versionId}/variables`, {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
+    examples: (versionId: string) =>
+      request<import("./types").Example[]>(`/versions/${versionId}/examples`),
+    createExample: (versionId: string, data: object) =>
+      request<import("./types").Example>(`/versions/${versionId}/examples`, {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
+    run: (versionId: string, input_payload: Record<string, unknown>, apply_style_profile = true) =>
+      request<import("./types").Run>(`/versions/${versionId}/run`, {
+        method: "POST",
+        body: JSON.stringify({ input_payload, apply_style_profile }),
+      }),
+    runs: (params?: Record<string, string>) => {
+      const q = params ? "?" + new URLSearchParams(params).toString() : "";
+      return request<import("./types").Run[]>(`/runs${q}`);
+    },
+    rate: (runId: string, data: object) =>
+      request<import("./types").RunRating>(`/runs/${runId}/rating`, {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
+    fieldQuality: (versionId: string) =>
+      request<import("./types").FieldQuality>(`/versions/${versionId}/field-quality`),
+    promoteExample: (runId: string, note: string) =>
+      request<import("./types").Example>(`/runs/${runId}/promote-example`, {
+        method: "POST",
+        body: JSON.stringify({ note }),
+      }),
+    promoteTest: (runId: string, note: string) =>
+      request<import("./types").TestCase>(`/runs/${runId}/promote-test`, {
+        method: "POST",
+        body: JSON.stringify({ note }),
+      }),
+    styleProfiles: () => request<import("./types").StyleProfile[]>("/style-profiles"),
+    createStyleProfile: (data: object) =>
+      request<import("./types").StyleProfile>("/style-profiles", {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
+    attachStyleProfile: (promptId: string, styleProfileId: string) =>
+      request<{ prompt_id: string; style_profile_id: string }>(`/prompts/${promptId}/style-profile/${styleProfileId}`, {
+        method: "POST",
+      }),
+    styleCheck: (style_profile_id: string, text: string) =>
+      request<{ style_profile_id: string; flags: import("./types").StyleFlag[] }>("/style-check", {
+        method: "POST",
+        body: JSON.stringify({ style_profile_id, text }),
+      }),
+    fetchSource: (source: string, data: object) =>
+      request<{ source: string; reference: string; content: string }>(`/integrations/${source}/fetch`, {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
+    comments: (target_type: string, target_id: string) =>
+      request<import("./types").Comment[]>(`/comments?${new URLSearchParams({ target_type, target_id })}`),
+    createComment: (data: object) =>
+      request<import("./types").Comment>("/comments", { method: "POST", body: JSON.stringify(data) }),
+  },
 };
 
 // Extend types for DiffOut

@@ -15,7 +15,7 @@ const RISK_COLORS: Record<string, string> = {
 
 function StatCard({ label, value, sub }: { label: string; value: string | number; sub?: string }) {
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-5">
+    <div className="bg-white rounded-lg border border-slate-200 p-5">
       <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">{label}</p>
       <p className="mt-1 text-3xl font-bold text-slate-900">{value ?? "—"}</p>
       {sub && <p className="mt-0.5 text-xs text-slate-400">{sub}</p>}
@@ -37,7 +37,7 @@ export default function DashboardPage() {
       <div className="space-y-4">
         <div className="grid grid-cols-4 gap-4">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="bg-white rounded-xl border border-slate-200 p-5 h-24 animate-pulse" />
+            <div key={i} className="bg-white rounded-lg border border-slate-200 p-5 h-24 animate-pulse" />
           ))}
         </div>
       </div>
@@ -65,7 +65,7 @@ export default function DashboardPage() {
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-xl border border-slate-200 p-5">
+        <div className="bg-white rounded-lg border border-slate-200 p-5">
           <h3 className="font-semibold text-slate-800 mb-4 text-sm">Prompts by Category</h3>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={categoryData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
@@ -77,7 +77,7 @@ export default function DashboardPage() {
           </ResponsiveContainer>
         </div>
 
-        <div className="bg-white rounded-xl border border-slate-200 p-5">
+        <div className="bg-white rounded-lg border border-slate-200 p-5">
           <h3 className="font-semibold text-slate-800 mb-4 text-sm">Risk Distribution</h3>
           <ResponsiveContainer width="100%" height={200}>
             <PieChart>
@@ -95,7 +95,7 @@ export default function DashboardPage() {
 
       {/* Tables */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-xl border border-slate-200 p-5">
+        <div className="bg-white rounded-lg border border-slate-200 p-5">
           <h3 className="font-semibold text-slate-800 mb-3 text-sm">Most Viewed Prompts</h3>
           <table className="w-full text-sm">
             <thead>
@@ -126,7 +126,7 @@ export default function DashboardPage() {
           </table>
         </div>
 
-        <div className="bg-white rounded-xl border border-slate-200 p-5">
+        <div className="bg-white rounded-lg border border-slate-200 p-5">
           <h3 className="font-semibold text-slate-800 mb-3 text-sm">Library Summary</h3>
           <dl className="space-y-2 text-sm">
             <div className="flex justify-between">

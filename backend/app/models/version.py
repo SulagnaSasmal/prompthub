@@ -27,3 +27,6 @@ class Version(Base):
     test_cases = relationship("TestCase", back_populates="version", cascade="all, delete-orphan")
     governance_checks = relationship("GovernanceCheck", back_populates="version", cascade="all, delete-orphan")
     workflow_logs = relationship("WorkflowLog", back_populates="version", cascade="all, delete-orphan")
+    variables = relationship("Variable", back_populates="version", cascade="all, delete-orphan")
+    runs = relationship("Run", back_populates="version", cascade="all, delete-orphan")
+    examples = relationship("Example", back_populates="version", cascade="all, delete-orphan")

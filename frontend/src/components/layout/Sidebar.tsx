@@ -5,8 +5,10 @@ import { useAuth } from "./AuthProvider";
 import clsx from "clsx";
 
 const nav = [
-  { href: "/library", label: "Library" },
+  { href: "/library", label: "Working Library" },
+  { href: "/runs", label: "Run History" },
   { href: "/dashboard", label: "Dashboard" },
+  { href: "/prompts/new", label: "Admin" },
 ];
 
 export function Sidebar() {
@@ -17,7 +19,7 @@ export function Sidebar() {
     <aside className="fixed left-0 top-0 h-full w-64 bg-slate-900 text-white flex flex-col">
       <div className="px-6 py-5 border-b border-slate-700">
         <h1 className="text-lg font-bold tracking-tight text-white">PromptHub</h1>
-        <p className="text-xs text-slate-400 mt-0.5">Enterprise Prompt Management</p>
+        <p className="text-xs text-slate-400 mt-0.5">Governed Writing Workspace</p>
       </div>
 
       <nav className="flex-1 px-4 py-4 space-y-1">
