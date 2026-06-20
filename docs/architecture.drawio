@@ -1,0 +1,43 @@
+<mxfile host="app.diagrams.net">
+  <diagram id="prompthub-architecture" name="PromptHub Architecture">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="ui" value="Next.js App Router UI&#xa;Working Library, Runner, Review Queue, Admin" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dbeafe;strokeColor=#2563eb;" vertex="1" parent="1">
+          <mxGeometry x="80" y="80" width="260" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="api" value="FastAPI Backend&#xa;Auth, Workflows, Gateway, Audit, Webhooks" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dcfce7;strokeColor=#16a34a;" vertex="1" parent="1">
+          <mxGeometry x="420" y="80" width="280" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="db" value="PostgreSQL&#xa;Prompts, Versions, Runs, Audit Events, Packs" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fef3c7;strokeColor=#d97706;" vertex="1" parent="1">
+          <mxGeometry x="800" y="80" width="240" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="gateway" value="Model Gateway&#xa;OpenAI, Azure OpenAI, Anthropic, Bedrock, Internal HTTP" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e8ff;strokeColor=#9333ea;" vertex="1" parent="1">
+          <mxGeometry x="420" y="260" width="280" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="sources" value="Read-only Sources&#xa;GitHub, Jira, OpenAPI, Markdown" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fee2e2;strokeColor=#dc2626;" vertex="1" parent="1">
+          <mxGeometry x="80" y="260" width="260" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="downstream" value="Downstream Systems&#xa;GitHub Action, Webhooks, Export Packages" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e0f2fe;strokeColor=#0284c7;" vertex="1" parent="1">
+          <mxGeometry x="800" y="260" width="240" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="edge1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="ui" target="api">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="api" target="db">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="api" target="gateway">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="api" target="sources">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="api" target="downstream">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

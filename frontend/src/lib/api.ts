@@ -170,6 +170,13 @@ export const api = {
       request<import("./types").RunExport>(`/runs/${runId}/export`, {
         method: "POST",
       }),
+    publishRun: (runId: string, data: object) =>
+      request<import("./types").ExportEvent>(`/runs/${runId}/publish`, {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
+    compareRuns: (leftRunId: string, rightRunId: string) =>
+      request<import("./types").RunComparison>(`/runs/compare/${leftRunId}/${rightRunId}`),
     styleProfiles: () => request<import("./types").StyleProfile[]>("/style-profiles"),
     createStyleProfile: (data: object) =>
       request<import("./types").StyleProfile>("/style-profiles", {
@@ -191,8 +198,46 @@ export const api = {
         body: JSON.stringify(data),
       }),
     integrations: () => request<import("./types").IntegrationCapability[]>("/integrations"),
+    createIntegration: (data: object) =>
+      request<import("./types").IntegrationConnection>("/integrations", {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
+    integrationConnections: () => request<import("./types").IntegrationConnection[]>("/integration-connections"),
+    sourceReferences: () => request<import("./types").SourceReference[]>("/source-references"),
+    exportEvents: () => request<import("./types").ExportEvent[]>("/export-events"),
     reviewQueue: () => request<import("./types").ReviewQueueItem[]>("/review-queue"),
     deployments: () => request<import("./types").DeploymentSummary[]>("/deployments"),
+    workflowPacks: () => request<import("./types").WorkflowPack[]>("/workflow-packs"),
+    createWorkflowPack: (data: object) =>
+      request<import("./types").WorkflowPack>("/workflow-packs", {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
+    importWorkflowPack: (data: object) =>
+      request<import("./types").WorkflowPack>("/workflow-packs/import", {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
+    modelProviders: () => request<import("./types").ModelProvider[]>("/model-providers"),
+    createModelProvider: (data: object) =>
+      request<import("./types").ModelProvider>("/model-providers", {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
+    auditEvents: () => request<import("./types").AuditEvent[]>("/audit-events"),
+    retentionPolicies: () => request<import("./types").RetentionPolicy[]>("/security/retention-policies"),
+    createRetentionPolicy: (data: object) =>
+      request<import("./types").RetentionPolicy>("/security/retention-policies", {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
+    authConfigs: () => request<import("./types").EnterpriseAuthConfig[]>("/security/auth-configs"),
+    createAuthConfig: (data: object) =>
+      request<import("./types").EnterpriseAuthConfig>("/security/auth-configs", {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
     comments: (target_type: string, target_id: string) =>
       request<import("./types").Comment[]>(`/comments?${new URLSearchParams({ target_type, target_id })}`),
     createComment: (data: object) =>

@@ -1,0 +1,32 @@
+name: PromptHub Docs Check
+description: Run PromptHub style checks against documentation files in a pull request.
+inputs:
+  api-url:
+    description: Base PromptHub API URL, for example https://example.com
+    required: true
+  token:
+    description: PromptHub bearer token
+    required: true
+  style-profile-id:
+    description: PromptHub style profile UUID
+    required: true
+  files:
+    description: Newline-separated list of files to check
+    required: false
+    default: ""
+  fail-on-error:
+    description: Fail when PromptHub returns error-severity flags
+    required: false
+    default: "true"
+runs:
+  using: composite
+  steps:
+    - name: Run PromptHub style check
+      shell: bash
+      env:
+        PROMPTHUB_API_URL: ${{ inputs.api-url }}
+        PROMPTHUB_TOKEN: ${{ inputs.token }}
+        PROMPTHUB_STYLE_PROFILE_ID: ${{ inputs.style-profile-id }}
+        PROMPTHUB_FILES: ${{ inputs.files }}
+        PROMPTHUB_FAIL_ON_ERROR: ${{ inputs.fail-on-error }}
+      run: python "$GITHUB_ACTION_PATH/prompthub_docs_check.py"

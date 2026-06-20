@@ -601,7 +601,7 @@ The project is complete when all of the following are demonstrable end to end:
 | Deliverable | Status |
 |-------------|--------|
 | GitHub repository with source code, docker-compose, and CI lint | Done |
-| Architecture diagram with source committed | Pending |
+| Architecture diagram with source committed | Done |
 | Demo video, 5 to 10 minutes | Pending |
 | Documentation portal with all seven documents | Done |
 | Prompt catalog with 20 to 30 governed enterprise prompts | Done |
@@ -621,7 +621,7 @@ The project is complete when all of the following are demonstrable end to end:
 | 7 | Audit log shows transitions and exports CSV | Done |
 | 8 | PII governance Fail blocks promotion | Done |
 | 9 | Dashboard renders all eight metrics against seeded catalog | Done |
-| 10 | Fresh user can complete create-and-submit flow using only guide material | Partial |
+| 10 | Fresh user can complete create-and-submit flow using only guide material | Done |
 
 ---
 

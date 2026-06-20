@@ -403,7 +403,7 @@ The upgrade is complete when all of the following are demonstrable:
 | Feature | Status | Notes |
 |---------|--------|-------|
 | Prompt Runner | Done | Workflows can be run from the detail page through the backend gateway. |
-| Server-side model gateway boundary | Partial | Gateway exists and blocks direct browser provider calls; real provider execution is v3 pending. |
+| Server-side model gateway boundary | Done | Gateway exists, blocks direct browser provider calls, and can route to configured server-side providers. |
 | Run persistence | Done | Runs store input payload, output, model, latency, governance result, user, and timestamp. |
 | Runner guardrails | Done | Consumers can only run Approved or Production versions; PII/compliance blocks are logged. |
 | Template variables | Done | Variables are declared, validated against prompt text, rendered as inputs, and required fields block runs. |
@@ -477,7 +477,7 @@ The upgrade is complete when all of the following are demonstrable:
 | 9 | Style Profile flags banned phrase and can be injected at runtime | Done |
 | 10 | Release-notes workflow pulls Jira ticket as input | Partial |
 | 11 | v1 governance capabilities still pass | Done |
-| 12 | Fresh writer completes find-run-adapt-improve using only User Guide | Partial |
+| 12 | Fresh writer completes find-run-adapt-improve using only User Guide | Done |
 
 ---
 

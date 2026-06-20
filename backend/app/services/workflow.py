@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.models.version import Version
 from app.models.workflow_log import WorkflowLog
+from app.services.audit_service import record_audit_event
 from app.services.model_gateway import referenced_variables
 
 # Valid transitions: current_status -> allowed next statuses
@@ -187,6 +188,14 @@ def transition(
         version.submitted_at = datetime.now(timezone.utc)
 
     _log(version, from_status, to_status, actor_id, comment, db)
+    record_audit_event(
+        db,
+        event_type="workflow.transitioned",
+        target_type="version",
+        target_id=version.version_id,
+        actor_id=actor_id,
+        payload={"from_status": from_status, "to_status": to_status, "comment": comment},
+    )
     version.status = to_status
 
     # Sync prompt status to highest-priority version status

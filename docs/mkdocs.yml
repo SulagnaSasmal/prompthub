@@ -23,6 +23,7 @@ nav:
   - Prompt Design Standards: prompt-design-standards.md
   - Architecture: architecture.md
   - API Reference: api-reference.md
+  - GitHub Action: github-action.md
   - FAQ: faq.md
   - Release Notes: release-notes.md
 

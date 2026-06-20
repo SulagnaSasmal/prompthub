@@ -66,11 +66,30 @@ def test_v3_integrations_review_queue_and_markdown_export(client):
     })
     assert run_resp.status_code == 200
     run_id = run_resp.json()["run_id"]
+    second_run_resp = client.post(f"/api/v1/versions/{version_id}/run", headers=_headers(token), json={
+        "input_payload": {"source_text": "New API migration note."},
+        "apply_style_profile": False,
+    })
+    assert second_run_resp.status_code == 200
 
     export_resp = client.post(f"/api/v1/runs/{run_id}/export", headers=_headers(token))
     assert export_resp.status_code == 200
     assert export_resp.json()["filename"].endswith(".md")
     assert "## Output" in export_resp.json()["content"]
+
+    compare_resp = client.get(
+        f"/api/v1/runs/compare/{run_id}/{second_run_resp.json()['run_id']}",
+        headers=_headers(token),
+    )
+    assert compare_resp.status_code == 200
+    assert compare_resp.json()["diff_lines"]
+
+    publish_resp = client.post(f"/api/v1/runs/{run_id}/publish", headers=_headers(token), json={
+        "target_type": "downloadable_run_package",
+        "mode": "draft",
+    })
+    assert publish_resp.status_code == 201
+    assert publish_resp.json()["status"] == "Drafted"
 
     transition_resp = client.post(f"/api/v1/versions/{version_id}/transition", headers=_headers(token), json={
         "to_status": "In Review",
@@ -81,3 +100,46 @@ def test_v3_integrations_review_queue_and_markdown_export(client):
     queue_resp = client.get("/api/v1/review-queue", headers=_headers(token))
     assert queue_resp.status_code == 200
     assert any(item["prompt_id"] == prompt_id for item in queue_resp.json())
+
+    provider_resp = client.post("/api/v1/model-providers", headers=_headers(token), json={
+        "name": "Internal test provider",
+        "provider_type": "internal_http",
+        "model_name": "GPT-5",
+        "status": "Active",
+        "config_json": {"endpoint": "https://example.com/model"},
+        "credentials": "secret",
+    })
+    assert provider_resp.status_code == 201
+    assert provider_resp.json()["credential_status"] == "configured"
+
+    pack_resp = client.post("/api/v1/workflow-packs/import", headers=_headers(token), json={
+        "name": "Test Pack",
+        "source_url": "https://github.com/example/prompts",
+        "license": "MIT",
+        "manifest_json": {"workflows": []},
+    })
+    assert pack_resp.status_code == 201
+    assert pack_resp.json()["status"] == "Draft"
+    assert pack_resp.json()["manifest_json"]["license"] == "MIT"
+
+    retention_resp = client.post("/api/v1/security/retention-policies", headers=_headers(token), json={
+        "name": "Short retention",
+        "retention_days": 30,
+        "private_source_storage": "reference_only",
+    })
+    assert retention_resp.status_code == 201
+
+    auth_resp = client.post("/api/v1/security/auth-configs", headers=_headers(token), json={
+        "provider_type": "oidc",
+        "name": "OIDC Test",
+        "issuer_url": "https://idp.example.com",
+        "client_id": "prompthub",
+        "client_secret": "secret",
+    })
+    assert auth_resp.status_code == 201
+    assert auth_resp.json()["secret_status"] == "configured"
+
+    audit_resp = client.get("/api/v1/audit-events", headers=_headers(token))
+    assert audit_resp.status_code == 200
+    event_types = {event["event_type"] for event in audit_resp.json()}
+    assert {"run.executed", "output.exported", "workflow_pack.imported"}.issubset(event_types)

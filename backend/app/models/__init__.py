@@ -8,6 +8,16 @@ from app.models.workflow_log import WorkflowLog
 from app.models.workflow_v2 import Comment, Example, Run, RunRating, StyleProfile, StyleRule, Variable
 from app.models.webhook import WebhookDelivery, WebhookEndpoint
 from app.models.password_reset import PasswordResetToken
+from app.models.workflow_v3 import (
+    AuditEvent,
+    EnterpriseAuthConfig,
+    ExportEvent,
+    IntegrationConnection,
+    ModelProvider,
+    RetentionPolicy,
+    SourceReference,
+    WorkflowPack,
+)
 
 __all__ = [
     "User",
@@ -27,4 +37,12 @@ __all__ = [
     "WebhookEndpoint",
     "WebhookDelivery",
     "PasswordResetToken",
+    "AuditEvent",
+    "IntegrationConnection",
+    "SourceReference",
+    "ExportEvent",
+    "WorkflowPack",
+    "ModelProvider",
+    "RetentionPolicy",
+    "EnterpriseAuthConfig",
 ]

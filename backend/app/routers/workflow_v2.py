@@ -1,3 +1,4 @@
+import hashlib
 from urllib.parse import urlparse
 from uuid import UUID
 
@@ -12,6 +13,7 @@ from app.models.prompt import Prompt
 from app.models.test_case import TestCase
 from app.models.user import User
 from app.models.version import Version
+from app.models.workflow_v3 import ExportEvent, ModelProvider, SourceReference
 from app.models.workflow_v2 import Comment, Example, Run, RunRating, StyleProfile, StyleRule, Variable
 from app.schemas.test_case import TestCaseOut
 from app.schemas.workflow_v2 import (
@@ -39,7 +41,8 @@ from app.schemas.workflow_v2 import (
     VariableIn,
     VariableOut,
 )
-from app.services.model_gateway import governance_block_reason, referenced_variables, run_private_gateway
+from app.services.audit_service import record_audit_event
+from app.services.model_gateway import governance_block_reason, referenced_variables, run_configured_provider
 
 router = APIRouter(prefix="/api/v1", tags=["workflows-v2"])
 
@@ -292,6 +295,7 @@ def define_variables(
     db.query(Variable).filter(Variable.version_id == version_id).delete()
     created = [Variable(version_id=version_id, **variable.model_dump()) for variable in body]
     db.add_all(created)
+    record_audit_event(db, event_type="variables.changed", target_type="version", target_id=version_id, actor_id=_.user_id)
     db.commit()
     return db.query(Variable).filter(Variable.version_id == version_id).order_by(Variable.name).all()
 
@@ -311,6 +315,7 @@ def create_example(
     _get_version(db, version_id)
     example = Example(version_id=version_id, **body.model_dump())
     db.add(example)
+    record_audit_event(db, event_type="examples.changed", target_type="version", target_id=version_id, actor_id=_.user_id)
     db.commit()
     db.refresh(example)
     return example
@@ -340,7 +345,18 @@ def run_version(
     latency_ms = 0
     result = "Blocked" if block_reason else "Pass"
     if not block_reason:
-        output_text, latency_ms = run_private_gateway(version, body.input_payload, style_profile)
+        provider = (
+            db.query(ModelProvider)
+            .filter(
+                ModelProvider.status == "Active",
+                ModelProvider.model_name == version.prompt.target_model,
+            )
+            .order_by(ModelProvider.created_at.desc())
+            .first()
+        )
+        if not provider:
+            provider = db.query(ModelProvider).filter(ModelProvider.status == "Active").order_by(ModelProvider.created_at.desc()).first()
+        output_text, latency_ms = run_configured_provider(version, body.input_payload, style_profile, provider)
         block_reason = governance_block_reason(output_text)
         if block_reason:
             output_text = None
@@ -359,6 +375,15 @@ def run_version(
     )
     version.prompt.run_count = int(version.prompt.run_count or 0) + 1
     db.add(run)
+    db.flush()
+    record_audit_event(
+        db,
+        event_type="run.executed",
+        target_type="run",
+        target_id=run.run_id,
+        actor_id=current_user.user_id,
+        payload={"version_id": str(version_id), "governance_result": result},
+    )
     db.commit()
     db.refresh(run)
     return run
@@ -389,6 +414,14 @@ def rate_run(run_id: UUID, body: RatingIn, db: Session = Depends(get_db), curren
         raise HTTPException(status_code=400, detail=f"Unknown rating tags: {invalid}")
     rating = RunRating(run_id=run_id, rated_by=current_user.user_id, **body.model_dump())
     db.add(rating)
+    record_audit_event(
+        db,
+        event_type="rating.submitted",
+        target_type="run",
+        target_id=run_id,
+        actor_id=current_user.user_id,
+        payload={"tags": body.tags},
+    )
     db.commit()
     db.refresh(rating)
     return rating
@@ -432,6 +465,7 @@ def promote_example(
         source_run_id=run.run_id,
     )
     db.add(example)
+    record_audit_event(db, event_type="example.promoted_from_run", target_type="run", target_id=run.run_id, actor_id=_.user_id)
     db.commit()
     db.refresh(example)
     return example
@@ -457,6 +491,7 @@ def promote_test(
         tested_by=current_user.user_id,
     )
     db.add(test_case)
+    record_audit_event(db, event_type="test.promoted_from_run", target_type="run", target_id=run.run_id, actor_id=current_user.user_id)
     db.commit()
     db.refresh(test_case)
     return test_case
@@ -483,6 +518,7 @@ def create_style_profile(
     db.flush()
     for rule in body.rules:
         db.add(StyleRule(style_profile_id=profile.style_profile_id, **rule.model_dump()))
+    record_audit_event(db, event_type="style_profile.changed", target_type="style_profile", target_id=profile.style_profile_id, actor_id=current_user.user_id)
     db.commit()
     db.refresh(profile)
     return profile
@@ -513,6 +549,7 @@ def attach_style_profile(
     if not prompt or not profile:
         raise HTTPException(status_code=404, detail="Prompt or style profile not found")
     prompt.style_profile_id = style_profile_id
+    record_audit_event(db, event_type="style_profile.attached", target_type="workflow", target_id=prompt_id, actor_id=_.user_id)
     db.commit()
     return {"prompt_id": prompt_id, "style_profile_id": style_profile_id}
 
@@ -526,7 +563,8 @@ def list_integrations(_: User = Depends(get_current_user)):
 def fetch_source(
     source: str,
     body: IntegrationFetchRequest,
-    _: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     source = source.lower()
     if source == "markdown":
@@ -552,6 +590,23 @@ def fetch_source(
         content = body.content or f"OpenAPI source reference {reference} ready for API-summary workflows."
     else:
         raise HTTPException(status_code=400, detail="source must be markdown, github, jira, or openapi")
+    source_ref = SourceReference(
+        provider=source,
+        locator=reference,
+        content_hash=hashlib.sha256(content.encode("utf-8")).hexdigest(),
+        metadata_json={"stored_as": "reference", "content_length": len(content)},
+    )
+    db.add(source_ref)
+    db.flush()
+    record_audit_event(
+        db,
+        event_type="source.fetched",
+        target_type="source_reference",
+        target_id=source_ref.source_reference_id,
+        actor_id=current_user.user_id,
+        payload={"provider": source, "locator": reference},
+    )
+    db.commit()
     return IntegrationFetchOut(source=source, reference=reference, content=content)
 
 
@@ -582,6 +637,23 @@ def export_run_markdown(run_id: UUID, db: Session = Depends(get_db), current_use
         + "\n"
     )
     filename = f"{workflow_name.lower().replace(' ', '-')}-{str(run.run_id)[:8]}.md"
+    event = ExportEvent(
+        run_id=run.run_id,
+        target_type="markdown",
+        target_reference=filename,
+        exported_by=current_user.user_id,
+        status="Exported",
+    )
+    db.add(event)
+    record_audit_event(
+        db,
+        event_type="output.exported",
+        target_type="run",
+        target_id=run.run_id,
+        actor_id=current_user.user_id,
+        payload={"target_type": "markdown", "filename": filename},
+    )
+    db.commit()
     return RunExportOut(run_id=run.run_id, filename=filename, target_type="markdown", content=content)
 
 
@@ -666,6 +738,13 @@ def create_comment(body: CommentIn, db: Session = Depends(get_db), current_user:
         raise HTTPException(status_code=400, detail="target_type must be workflow, version, or run")
     comment = Comment(**body.model_dump(), author_id=current_user.user_id)
     db.add(comment)
+    record_audit_event(
+        db,
+        event_type="comment.created",
+        target_type=body.target_type,
+        target_id=body.target_id,
+        actor_id=current_user.user_id,
+    )
     db.commit()
     db.refresh(comment)
     return comment

@@ -10,7 +10,11 @@ const nav = [
   { href: "/review", label: "Review Queue" },
   { href: "/style-profiles", label: "Style Profiles" },
   { href: "/integrations", label: "Integrations" },
+  { href: "/workflow-packs", label: "Workflow Packs" },
+  { href: "/model-providers", label: "Model Providers" },
   { href: "/deployments", label: "Deployments" },
+  { href: "/audit-events", label: "Audit Events" },
+  { href: "/security", label: "Security" },
   { href: "/dashboard", label: "Dashboard" },
   { href: "/admin", label: "Admin" },
   { href: "/help", label: "Help" },
@@ -27,7 +31,7 @@ export function Sidebar() {
         <p className="text-xs text-slate-400 mt-0.5">Governed Writing Workspace</p>
       </div>
 
-      <nav className="flex-1 px-4 py-4 space-y-1">
+      <nav className="flex-1 space-y-1 overflow-y-auto px-4 py-4">
         {nav.map(({ href, label }) => (
           <Link
             key={href}

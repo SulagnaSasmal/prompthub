@@ -1,0 +1,31 @@
+name: PromptHub Docs Check
+
+on:
+  pull_request:
+    paths:
+      - "docs/**"
+      - "**/*.md"
+      - "openapi/**"
+
+jobs:
+  prompthub:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Collect changed Markdown files
+        id: files
+        shell: bash
+        run: |
+          git fetch origin "${{ github.base_ref }}" --depth=1
+          git diff --name-only "origin/${{ github.base_ref }}"...HEAD -- '*.md' > /tmp/prompthub-files.txt
+          {
+            echo "files<<EOF"
+            cat /tmp/prompthub-files.txt
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+      - uses: ./.github/actions/prompthub-docs-check
+        with:
+          api-url: ${{ secrets.PROMPTHUB_API_URL }}
+          token: ${{ secrets.PROMPTHUB_TOKEN }}
+          style-profile-id: ${{ secrets.PROMPTHUB_STYLE_PROFILE_ID }}
+          files: ${{ steps.files.outputs.files }}

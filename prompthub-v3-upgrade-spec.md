@@ -901,7 +901,7 @@ This slice gives the biggest user-visible improvement without trying to build ev
 | Evaluate and improve outputs | Done |
 | Enforce terminology and style | Done |
 | Export result | Done |
-| Publish/write back to downstream systems | Pending |
+| Publish/write back to downstream systems | Partial |
 | Deploy approved prompt changes safely through webhooks | Done |
 
 ### 10.2 Core Product Model
@@ -916,11 +916,11 @@ This slice gives the biggest user-visible improvement without trying to build ev
 | Evaluations | Done |
 | Style profile | Done |
 | Run history | Done |
-| Usage analytics | Partial |
+| Usage analytics | Done |
 | Approval state | Done |
 | Deployment webhook state | Done |
 | Export destinations | Partial |
-| Publishing destinations | Pending |
+| Publishing destinations | Partial |
 | Consistent Workflow language across UI/docs/API | Partial |
 
 ### 10.3 Information Architecture
@@ -942,40 +942,40 @@ This slice gives the biggest user-visible improvement without trying to build ev
 | Feature area | Status | Notes |
 |--------------|--------|-------|
 | Runner as main product surface | Done | Split source/input/result workflow exists on detail page. |
-| Output comparison | Partial | Version diff exists; run-to-run output comparison is pending. |
+| Output comparison | Done | Version diff and run-to-run output comparison are implemented. |
 | GitHub integration | Done | Public read-only fetch for issues, PRs, commits, blobs/raw files, and repo summaries. |
 | Jira integration | Partial | Pasted or simulated Jira source works; authenticated Jira fetch is pending. |
 | OpenAPI integration | Partial | Pasted OpenAPI source works; URL pull, parsing, and diff are pending. |
 | Markdown/file integration | Partial | Pasted Markdown works; file upload parser is pending. |
 | Style profiles and terminology | Done | Rule creation, attachment, injection, and style check exist. |
-| Pull Request style check | Pending |
+| Pull Request style check | Done |
 | Markdown export | Done |
-| JSON/CSV export | Pending |
-| GitHub/Confluence/Jira publishing | Pending |
+| JSON/CSV export | Partial |
+| GitHub/Confluence/Jira publishing | Partial |
 | Review Queue | Done |
 | Deployment Center | Done |
-| Plugin and extension strategy | Pending |
-| Marketplace and workflow packs | Partial | Community seed prompts exist; full pack import/export and license review are pending. |
-| Real model gateway | Partial | Gateway boundary exists; real provider execution/configuration is pending. |
-| Governance and audit expansion | Partial | Core workflow audit exists; all new v3 event types are not yet modeled in `audit_events`. |
-| Security and compliance | Partial | Password reset no longer exposes tokens in UI; SSO, OIDC/SAML, encryption, rate limits, retention policies are pending. |
+| Plugin and extension strategy | Partial |
+| Marketplace and workflow packs | Done | Pack import/export records, source provenance, license metadata, and admin review status are implemented. |
+| Real model gateway | Done | Provider configuration and gateway routing exist for OpenAI, Azure OpenAI, Anthropic, internal HTTP, and Bedrock-ready config. |
+| Governance and audit expansion | Done | New v3 event types are recorded in `audit_events` for runs, exports, sources, providers, packs, security, and workflow activity. |
+| Security and compliance | Partial | Token hiding is configurable, secrets are encrypted, rate limits, retention policies, and OIDC/SAML config records exist; full SSO login handshake still requires IdP integration. |
 
 ### 10.5 Data Model Additions
 
 | Model | Status |
 |-------|--------|
-| `integration_connections` | Pending |
-| `source_references` | Pending |
-| `export_events` | Pending |
-| `workflow_packs` | Pending |
-| `model_providers` | Pending |
-| `audit_events` | Pending |
+| `integration_connections` | Done |
+| `source_references` | Done |
+| `export_events` | Done |
+| `workflow_packs` | Done |
+| `model_providers` | Done |
+| `audit_events` | Done |
 
 ### 10.6 API Additions
 
 | Endpoint | Status |
 |----------|--------|
-| `GET/POST /api/v1/integrations` | Partial |
+| `GET/POST /api/v1/integrations` | Done |
 | `POST /api/v1/integrations/{provider}/fetch` | Done |
 | `GET/POST /api/v1/style-profiles` | Done |
 | `POST /api/v1/style-check` | Done |
@@ -983,11 +983,11 @@ This slice gives the biggest user-visible improvement without trying to build ev
 | `GET /api/v1/review-queue` | Done |
 | `GET /api/v1/deployments` | Done |
 | `POST /api/v1/deployments/{id}/replay` | Partial |
-| `GET/POST /api/v1/workflow-packs` | Pending |
-| `POST /api/v1/workflow-packs/import` | Pending |
-| `GET/POST /api/v1/model-providers` | Pending |
-| `GET /api/v1/audit-events` | Pending |
-| `GET /api/v1/audit-events/export` | Pending |
+| `GET/POST /api/v1/workflow-packs` | Done |
+| `POST /api/v1/workflow-packs/import` | Done |
+| `GET/POST /api/v1/model-providers` | Done |
+| `GET /api/v1/audit-events` | Done |
+| `GET /api/v1/audit-events/export` | Done |
 
 ### 10.7 Implementation Plan
 
@@ -998,10 +998,10 @@ This slice gives the biggest user-visible improvement without trying to build ev
 | Phase 3: Runner 2.0 | Partial |
 | Phase 4: Style Profiles 2.0 | Partial |
 | Phase 5: Review Queue and Deployment Center | Done |
-| Phase 6: Model Gateway | Partial |
-| Phase 7: Plugins | Pending |
-| Phase 8: Workflow Packs | Pending |
-| Phase 9: Security and Enterprise Readiness | Pending |
+| Phase 6: Model Gateway | Done |
+| Phase 7: Plugins | Partial |
+| Phase 8: Workflow Packs | Done |
+| Phase 9: Security and Enterprise Readiness | Partial |
 
 ### 10.8 Acceptance Criteria
 
@@ -1011,17 +1011,17 @@ This slice gives the biggest user-visible improvement without trying to build ev
 | 2 | Writer can run workflow from real GitHub source content | Done |
 | 3 | Writer can run workflow from real Jira source content | Partial |
 | 4 | Writer can run workflow from OpenAPI diff content | Partial |
-| 5 | Writer can compare two generated outputs | Pending |
+| 5 | Writer can compare two generated outputs | Done |
 | 6 | Writer can export output to Markdown | Done |
 | 7 | Style Profile flags terminology and suggests replacements | Done |
 | 8 | Reviewer can process all review items from Review Queue | Partial |
 | 9 | Approver can inspect deployments and replay failed webhooks | Done |
-| 10 | GitHub Action can run style check on docs PR | Pending |
-| 11 | Real model provider can be configured and used through gateway | Pending |
+| 10 | GitHub Action can run style check on docs PR | Done |
+| 11 | Real model provider can be configured and used through gateway | Done |
 | 12 | All v2 governance features still pass | Done |
-| 13 | All new actions appear in audit events | Partial |
+| 13 | All new actions appear in audit events | Done |
 | 14 | Password reset no longer exposes tokens in UI | Done |
-| 15 | Seeded workflow packs include source provenance and license metadata | Pending |
+| 15 | Seeded workflow packs include source provenance and license metadata | Done |
 
 ### 10.9 Recommended First Build Slice
 
@@ -1033,4 +1033,4 @@ This slice gives the biggest user-visible improvement without trying to build ev
 | Add Runner split view | Done |
 | Add Markdown export | Done |
 | Add style rule editor | Done |
-| Add GitHub Action MVP | Pending |
+| Add GitHub Action MVP | Done |

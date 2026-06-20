@@ -141,11 +141,49 @@ export interface IntegrationCapability {
   guidance: string;
 }
 
+export interface IntegrationConnection {
+  connection_id: string;
+  provider: string;
+  name: string;
+  status: string;
+  created_by: string;
+  created_at: string;
+  config_json: Record<string, unknown>;
+  secret_status?: string;
+}
+
+export interface SourceReference {
+  source_reference_id: string;
+  provider: string;
+  locator: string;
+  content_hash: string;
+  metadata_json: Record<string, unknown>;
+  created_at: string;
+}
+
 export interface RunExport {
   run_id: string;
   filename: string;
   target_type: "markdown";
   content: string;
+}
+
+export interface ExportEvent {
+  export_id: string;
+  run_id: string;
+  target_type: string;
+  target_reference?: string;
+  exported_by: string;
+  created_at: string;
+  status: string;
+}
+
+export interface RunComparison {
+  left_run_id: string;
+  right_run_id: string;
+  left_output: string;
+  right_output: string;
+  diff_lines: string[];
 }
 
 export interface ReviewQueueItem {
@@ -171,6 +209,62 @@ export interface DeploymentSummary {
   webhook_delivery_status: string;
   failed_deliveries: number;
   updated_at: string;
+}
+
+export interface WorkflowPack {
+  pack_id: string;
+  name: string;
+  source_url?: string;
+  license: string;
+  imported_by: string;
+  created_at: string;
+  status: string;
+  manifest_json: Record<string, unknown>;
+}
+
+export interface ModelProvider {
+  provider_id: string;
+  name: string;
+  provider_type: string;
+  model_name: string;
+  status: string;
+  config_json: Record<string, unknown>;
+  credential_status?: string;
+  created_by: string;
+  created_at: string;
+}
+
+export interface AuditEvent {
+  audit_event_id: string;
+  actor_id?: string;
+  event_type: string;
+  target_type: string;
+  target_id?: string;
+  payload: Record<string, unknown>;
+  created_at: string;
+}
+
+export interface RetentionPolicy {
+  retention_policy_id: string;
+  name: string;
+  applies_to: string;
+  retention_days: number;
+  redact_sensitive_inputs: boolean;
+  private_source_storage: string;
+  created_by: string;
+  created_at: string;
+}
+
+export interface EnterpriseAuthConfig {
+  auth_config_id: string;
+  provider_type: string;
+  name: string;
+  issuer_url?: string;
+  client_id?: string;
+  secret_status?: string;
+  status: string;
+  created_by: string;
+  created_at: string;
 }
 
 export interface WebhookEndpoint {

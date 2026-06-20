@@ -14,6 +14,7 @@ from app.schemas.webhook import (
     WebhookEndpointUpdate,
 )
 from app.services.webhook_delivery import attempt_delivery, retry_pending_deliveries
+from app.services.audit_service import record_audit_event
 
 router = APIRouter(prefix="/api/v1/webhooks", tags=["webhooks"])
 
@@ -38,6 +39,15 @@ def create_webhook(
         created_by=current_user.user_id,
     )
     db.add(endpoint)
+    db.flush()
+    record_audit_event(
+        db,
+        event_type="webhook_endpoint.changed",
+        target_type="webhook_endpoint",
+        target_id=endpoint.webhook_id,
+        actor_id=current_user.user_id,
+        payload={"name": body.name, "is_active": body.is_active},
+    )
     db.commit()
     db.refresh(endpoint)
     return endpoint
@@ -55,6 +65,14 @@ def update_webhook(
         raise HTTPException(status_code=404, detail="Webhook endpoint not found")
     for field, value in body.model_dump(exclude_none=True).items():
         setattr(endpoint, field, str(value) if field == "url" else value)
+    record_audit_event(
+        db,
+        event_type="webhook_endpoint.changed",
+        target_type="webhook_endpoint",
+        target_id=endpoint.webhook_id,
+        actor_id=_.user_id,
+        payload=body.model_dump(exclude_none=True),
+    )
     db.commit()
     db.refresh(endpoint)
     return endpoint
@@ -72,7 +90,16 @@ def retry_delivery(delivery_id: UUID, db: Session = Depends(get_db), _: User = D
         raise HTTPException(status_code=404, detail="Webhook delivery not found")
     if delivery.status == "Delivered":
         raise HTTPException(status_code=400, detail="Delivery already succeeded")
-    return attempt_delivery(db, delivery)
+    result = attempt_delivery(db, delivery)
+    record_audit_event(
+        db,
+        event_type="webhook_delivery.retried",
+        target_type="webhook_delivery",
+        target_id=delivery.delivery_id,
+        actor_id=_.user_id,
+    )
+    db.commit()
+    return result
 
 
 @router.post("/retry-pending", response_model=list[WebhookDeliveryOut])

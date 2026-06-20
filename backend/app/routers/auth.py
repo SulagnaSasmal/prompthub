@@ -5,6 +5,7 @@ from datetime import datetime, timedelta, timezone
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
+from app.core.config import settings
 from app.core.database import get_db
 from app.core.security import create_access_token, hash_password, verify_password
 from app.models.password_reset import PasswordResetToken
@@ -18,8 +19,21 @@ from app.schemas.user import (
     UserCreate,
     UserOut,
 )
+from app.services.audit_service import record_audit_event
 
 router = APIRouter(prefix="/api/v1/auth", tags=["auth"])
+
+_attempts: dict[str, list[datetime]] = {}
+
+
+def _rate_limit(key: str) -> None:
+    now = datetime.now(timezone.utc)
+    window_start = now - timedelta(minutes=1)
+    recent = [ts for ts in _attempts.get(key, []) if ts > window_start]
+    if len(recent) >= settings.auth_rate_limit_per_minute:
+        raise HTTPException(status_code=429, detail="Too many attempts. Try again shortly.")
+    recent.append(now)
+    _attempts[key] = recent
 
 
 @router.post("/register", response_model=UserOut, status_code=status.HTTP_201_CREATED)
@@ -43,6 +57,7 @@ def register(body: UserCreate, db: Session = Depends(get_db)):
 
 @router.post("/login", response_model=Token)
 def login(body: LoginRequest, db: Session = Depends(get_db)):
+    _rate_limit(f"login:{body.username.lower()}")
     user = db.query(User).filter(User.username == body.username, User.is_active == True).first()
     if not user or not verify_password(body.password, user.hashed_password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
@@ -52,9 +67,12 @@ def login(body: LoginRequest, db: Session = Depends(get_db)):
 
 @router.post("/forgot-password", response_model=ForgotPasswordOut)
 def forgot_password(body: ForgotPasswordRequest, db: Session = Depends(get_db)):
+    _rate_limit(f"reset:{body.email.lower()}")
     user = db.query(User).filter(User.email == body.email, User.is_active == True).first()
     message = "If an account exists for that email, a password reset link has been created."
     if not user:
+        record_audit_event(db, event_type="password_reset.requested", target_type="user", payload={"email": body.email, "matched": False})
+        db.commit()
         return ForgotPasswordOut(message=message)
 
     raw_token = secrets.token_urlsafe(32)
@@ -64,8 +82,9 @@ def forgot_password(body: ForgotPasswordRequest, db: Session = Depends(get_db)):
         expires_at=datetime.now(timezone.utc) + timedelta(minutes=30),
     )
     db.add(reset)
+    record_audit_event(db, event_type="password_reset.requested", target_type="user", target_id=user.user_id, payload={"email": body.email, "matched": True})
     db.commit()
-    return ForgotPasswordOut(message=message, reset_token=raw_token)
+    return ForgotPasswordOut(message=message, reset_token=raw_token if settings.expose_reset_token else None)
 
 
 @router.post("/reset-password")
@@ -87,6 +106,7 @@ def reset_password(body: ResetPasswordRequest, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Reset token is invalid or expired")
     user.hashed_password = hash_password(body.new_password)
     reset.used_at = datetime.now(timezone.utc)
+    record_audit_event(db, event_type="password_reset.completed", target_type="user", target_id=user.user_id)
     db.commit()
     return {"message": "Password updated. You can sign in with the new password."}
 
