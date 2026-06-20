@@ -39,6 +39,22 @@ Obtain a JWT token.
 { "access_token": "string", "token_type": "bearer" }
 ```
 
+### POST /api/v1/auth/forgot-password
+Create a short-lived password reset token for an email address.
+
+**Body:**
+```json
+{ "email": "user@example.com" }
+```
+
+### POST /api/v1/auth/reset-password
+Reset a password with a valid reset token.
+
+**Body:**
+```json
+{ "token": "string", "new_password": "new secure password" }
+```
+
 ---
 
 ## Prompts

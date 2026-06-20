@@ -5,6 +5,9 @@ import { AppShell } from "@/components/layout/AppShell";
 export const metadata: Metadata = {
   title: "PromptHub — Enterprise Prompt Management",
   description: "Version control, governance, and quality measurement for enterprise AI prompts",
+  icons: {
+    icon: "/icon.svg",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

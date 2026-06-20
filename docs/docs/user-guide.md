@@ -52,6 +52,20 @@ Your role determines what you can do:
 
 ---
 
+## Resetting a Password
+
+On the sign-in page, choose **Forgot password?** and enter the email address for the account. PromptHub creates a short-lived reset token, then asks for the token and a new password.
+
+In this build, the reset token is displayed in the UI because no email delivery service is configured. In a production mail setup, the same token should be sent by email instead of shown on screen.
+
+---
+
+## Seeded Prompt Sources
+
+The seeded catalog includes PromptHub-authored enterprise workflows plus a small community-inspired default set. The community seeds are original PromptHub templates based on task patterns observed in public prompt libraries such as `f/prompts.chat` and `JuliusBrussee/the-prompt-library`; provenance is recorded in workflow tags and usage notes.
+
+---
+
 ## Finding prompts in the Library
 
 The Library is your starting point. Use the filters at the top of the page:

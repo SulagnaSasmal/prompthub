@@ -577,6 +577,130 @@ PROMPTS_DATA = [
 ]
 
 
+COMMUNITY_PROMPTS = [
+    {
+        "name": "Community Prompt Improver",
+        "description": "Rewrites a rough prompt into a clearer, testable, governed workflow prompt.",
+        "category": "Documentation",
+        "subcategory": "Prompt Improvement",
+        "target_model": "claude-sonnet-4-6",
+        "risk_level": "Low",
+        "tags": ["community-seed", "prompt-improvement", "prompts.chat", "the-prompt-library"],
+        "usage_notes": (
+            "Seeded from public prompt-library patterns observed in f/prompts.chat (CC0 prompt data) "
+            "and JuliusBrussee/the-prompt-library (MIT). Template text is original to PromptHub."
+        ),
+        "versions": [
+            {
+                "number": "1.0",
+                "text": (
+                    "Improve the following draft prompt so it is specific, reusable, and testable. "
+                    "Return: Purpose, Required Inputs, Improved Prompt, Expected Output Shape, "
+                    "Failure Modes, and Test Ideas. Preserve the author's intent and do not add hidden requirements."
+                ),
+                "summary": "Community seed for prompt refinement",
+            },
+        ],
+    },
+    {
+        "name": "Repository Activity Summarizer",
+        "description": "Summarizes repository commits, pull requests, and issues into a documentation-ready activity brief.",
+        "category": "Documentation",
+        "subcategory": "Repository Summary",
+        "target_model": "claude-sonnet-4-6",
+        "risk_level": "Low",
+        "tags": ["community-seed", "github", "repository", "activity-summary"],
+        "usage_notes": (
+            "Inspired by GitHub prompt-file use cases for summarizing repository activity. "
+            "Template text is original to PromptHub."
+        ),
+        "versions": [
+            {
+                "number": "1.0",
+                "text": (
+                    "Summarize the repository activity below for a documentation lead. "
+                    "Group by Features, Fixes, Breaking Changes, Docs Impact, and Open Risks. "
+                    "Cite source identifiers when present. Do not infer shipped behavior from unmerged work."
+                ),
+                "summary": "Community seed for repo activity documentation",
+            },
+        ],
+    },
+    {
+        "name": "Technical Draft Clarity Rewrite",
+        "description": "Turns a dense technical draft into clearer documentation while preserving facts and constraints.",
+        "category": "Documentation",
+        "subcategory": "Tone Rewrite",
+        "target_model": "claude-haiku-4-5-20251001",
+        "risk_level": "Low",
+        "tags": ["community-seed", "technical-writing", "clarity", "rewrite"],
+        "usage_notes": (
+            "Seeded from common open prompt-library rewrite and technical-writing patterns. "
+            "Template text is original to PromptHub."
+        ),
+        "versions": [
+            {
+                "number": "1.0",
+                "text": (
+                    "Rewrite the draft below for a technical documentation audience. "
+                    "Keep every factual constraint, remove filler, define ambiguous terms, "
+                    "and return a concise version plus a list of assumptions that need review."
+                ),
+                "summary": "Community seed for technical clarity rewrites",
+            },
+        ],
+    },
+    {
+        "name": "Bug Report to KB Article",
+        "description": "Transforms a resolved bug report or support thread into a customer-facing knowledge base article.",
+        "category": "Support",
+        "subcategory": "KB Article",
+        "target_model": "claude-sonnet-4-6",
+        "risk_level": "Medium",
+        "tags": ["community-seed", "support", "kb", "bug-report"],
+        "usage_notes": (
+            "Seeded from public prompt-library task categories around support, summarization, and content drafting. "
+            "Template text is original to PromptHub."
+        ),
+        "versions": [
+            {
+                "number": "1.0",
+                "text": (
+                    "Convert the resolved bug report below into a knowledge base article. "
+                    "Include: Title, Symptoms, Cause, Affected Versions, Resolution, Workaround, "
+                    "Verification Steps, and Related Links. Do not expose private customer data."
+                ),
+                "summary": "Community seed for support-to-KB workflows",
+            },
+        ],
+    },
+    {
+        "name": "Migration Plan Drafter",
+        "description": "Drafts a stepwise migration plan from release notes, breaking changes, or upgrade requirements.",
+        "category": "Documentation",
+        "subcategory": "Migration Guide",
+        "target_model": "claude-sonnet-4-6",
+        "risk_level": "Medium",
+        "tags": ["community-seed", "migration", "upgrade", "developer-docs"],
+        "usage_notes": (
+            "Seeded from common open prompt-library planning and developer-documentation patterns. "
+            "Template text is original to PromptHub."
+        ),
+        "versions": [
+            {
+                "number": "1.0",
+                "text": (
+                    "Draft a migration plan from the source material below. "
+                    "Return: Audience, Preconditions, Step-by-step Plan, Validation Checks, Rollback Plan, "
+                    "Known Risks, and Documentation Gaps. Flag any missing information as [NEEDS OWNER]."
+                ),
+                "summary": "Community seed for migration planning workflows",
+            },
+        ],
+    },
+]
+
+
 def _task_type(prompt_name: str, subcategory: str) -> str:
     text = f"{prompt_name} {subcategory}".lower()
     if "release" in text or "changelog" in text or "what's new" in text:
@@ -654,7 +778,7 @@ def seed():
         reviewer = users["reviewer1"]
         approver = users["approver1"]
 
-        for pd in PROMPTS_DATA:
+        for pd in PROMPTS_DATA + COMMUNITY_PROMPTS:
             existing = db.query(Prompt).filter(Prompt.name == pd["name"]).first()
             if existing:
                 print(f"  Skip (exists): {pd['name']}")
@@ -669,6 +793,7 @@ def seed():
                 target_model=pd["target_model"],
                 risk_level=pd["risk_level"],
                 tags=pd["tags"],
+                usage_notes=pd.get("usage_notes", ""),
                 created_by=author.user_id,
                 status="Draft",
             )

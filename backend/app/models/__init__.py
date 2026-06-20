@@ -7,6 +7,7 @@ from app.models.governance import GovernanceCheck
 from app.models.workflow_log import WorkflowLog
 from app.models.workflow_v2 import Comment, Example, Run, RunRating, StyleProfile, StyleRule, Variable
 from app.models.webhook import WebhookDelivery, WebhookEndpoint
+from app.models.password_reset import PasswordResetToken
 
 __all__ = [
     "User",
@@ -25,4 +26,5 @@ __all__ = [
     "Comment",
     "WebhookEndpoint",
     "WebhookDelivery",
+    "PasswordResetToken",
 ]

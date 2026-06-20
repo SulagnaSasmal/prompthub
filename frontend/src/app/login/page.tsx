@@ -5,11 +5,13 @@ import { api } from "@/lib/api";
 import { useAuth } from "@/components/layout/AuthProvider";
 
 export default function LoginPage() {
-  const [mode, setMode] = useState<"login" | "register">("login");
+  const [mode, setMode] = useState<"login" | "register" | "forgot" | "reset">("login");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
   const [password, setPassword] = useState("");
+  const [resetToken, setResetToken] = useState("");
+  const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
@@ -19,7 +21,23 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     setError("");
+    setMessage("");
     try {
+      if (mode === "forgot") {
+        const response = await api.auth.forgotPassword(email);
+        setMessage(response.reset_token ? `${response.message} Demo token: ${response.reset_token}` : response.message);
+        if (response.reset_token) setResetToken(response.reset_token);
+        setMode("reset");
+        return;
+      }
+      if (mode === "reset") {
+        const response = await api.auth.resetPassword(resetToken, password);
+        setMessage(response.message);
+        setPassword("");
+        setResetToken("");
+        setMode("login");
+        return;
+      }
       if (mode === "register") {
         await api.auth.register({
           username,
@@ -51,22 +69,27 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
       <div className="w-full max-w-sm rounded-lg border border-slate-200 bg-white p-8 shadow-sm">
         <h1 className="mb-1 text-xl font-bold text-slate-900">
-          {mode === "login" ? "Sign in to PromptHub" : "Create your PromptHub account"}
+          {mode === "login" && "Sign in to PromptHub"}
+          {mode === "register" && "Create your PromptHub account"}
+          {mode === "forgot" && "Reset your password"}
+          {mode === "reset" && "Choose a new password"}
         </h1>
-        <p className="text-sm text-slate-500 mb-6">Enterprise Prompt Management</p>
+        <p className="text-sm text-slate-500 mb-6">Governed Writing Workspace</p>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="username" className="block text-sm font-medium text-slate-700 mb-1">Username</label>
-            <input
-              id="username"
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-              className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
-            />
-          </div>
-          {mode === "register" && (
+          {(mode === "login" || mode === "register") && (
+            <div>
+              <label htmlFor="username" className="block text-sm font-medium text-slate-700 mb-1">Username</label>
+              <input
+                id="username"
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+                className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+              />
+            </div>
+          )}
+          {(mode === "register" || mode === "forgot") && (
             <>
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-1">Email</label>
@@ -79,6 +102,10 @@ export default function LoginPage() {
                   className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                 />
               </div>
+            </>
+          )}
+          {mode === "register" && (
+            <>
               <div>
                 <label htmlFor="full_name" className="block text-sm font-medium text-slate-700 mb-1">Full name</label>
                 <input
@@ -91,8 +118,24 @@ export default function LoginPage() {
               </div>
             </>
           )}
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-1">Password</label>
+          {mode === "reset" && (
+            <div>
+              <label htmlFor="reset_token" className="block text-sm font-medium text-slate-700 mb-1">Reset token</label>
+              <textarea
+                id="reset_token"
+                value={resetToken}
+                onChange={(e) => setResetToken(e.target.value)}
+                required
+                rows={3}
+                className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+              />
+            </div>
+          )}
+          {mode !== "forgot" && (
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-1">
+                {mode === "reset" ? "New password" : "Password"}
+              </label>
             <input
               id="password"
               type="password"
@@ -101,21 +144,41 @@ export default function LoginPage() {
               required
               className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
             />
-          </div>
+            </div>
+          )}
           {error && <p className="text-sm text-red-600">{error}</p>}
+          {message && <p className="text-sm text-emerald-700">{message}</p>}
           <button
             type="submit"
             disabled={loading}
             className="w-full bg-brand-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-brand-700 disabled:opacity-60 transition-colors"
           >
-            {loading ? "Working..." : mode === "login" ? "Sign in" : "Create account"}
+            {loading && "Working..."}
+            {!loading && mode === "login" && "Sign in"}
+            {!loading && mode === "register" && "Create account"}
+            {!loading && mode === "forgot" && "Send reset link"}
+            {!loading && mode === "reset" && "Update password"}
           </button>
         </form>
+        {mode === "login" && (
+          <button
+            type="button"
+            onClick={() => {
+              setMode("forgot");
+              setError("");
+              setMessage("");
+            }}
+            className="mt-4 w-full text-center text-sm text-slate-500 hover:text-slate-900"
+          >
+            Forgot password?
+          </button>
+        )}
         <button
           type="button"
           onClick={() => {
             setMode((current) => (current === "login" ? "register" : "login"));
             setError("");
+            setMessage("");
           }}
           className="mt-4 w-full text-center text-sm text-brand-600 hover:text-brand-700"
         >

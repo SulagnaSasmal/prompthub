@@ -52,6 +52,16 @@ export const api = {
       }),
     register: (data: object) =>
       request<object>("/auth/register", { method: "POST", body: JSON.stringify(data) }),
+    forgotPassword: (email: string) =>
+      request<{ message: string; reset_token?: string }>("/auth/forgot-password", {
+        method: "POST",
+        body: JSON.stringify({ email }),
+      }),
+    resetPassword: (token: string, new_password: string) =>
+      request<{ message: string }>("/auth/reset-password", {
+        method: "POST",
+        body: JSON.stringify({ token, new_password }),
+      }),
   },
   prompts: {
     list: (params?: Record<string, string>) => {
