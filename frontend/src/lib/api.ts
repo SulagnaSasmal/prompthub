@@ -181,6 +181,28 @@ export const api = {
     createComment: (data: object) =>
       request<import("./types").Comment>("/comments", { method: "POST", body: JSON.stringify(data) }),
   },
+  webhooks: {
+    list: () => request<import("./types").WebhookEndpoint[]>("/webhooks"),
+    create: (data: object) =>
+      request<import("./types").WebhookEndpoint>("/webhooks", {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
+    update: (id: string, data: object) =>
+      request<import("./types").WebhookEndpoint>(`/webhooks/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify(data),
+      }),
+    deliveries: () => request<import("./types").WebhookDelivery[]>("/webhooks/deliveries"),
+    retry: (deliveryId: string) =>
+      request<import("./types").WebhookDelivery>(`/webhooks/deliveries/${deliveryId}/retry`, {
+        method: "POST",
+      }),
+    retryPending: () =>
+      request<import("./types").WebhookDelivery[]>("/webhooks/retry-pending", {
+        method: "POST",
+      }),
+  },
 };
 
 // Extend types for DiffOut
