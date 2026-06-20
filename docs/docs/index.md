@@ -20,7 +20,7 @@
     3. Click a prompt to see its text, version history, and quality score
 
 === "Author"
-    1. [Register](user-guide.md#register) or sign in
+    1. [Register](user-guide.md) or sign in
     2. Go to **Library** and click **+ New Prompt**
     3. Fill in all required metadata fields
     4. Create version 1.0 and submit for review

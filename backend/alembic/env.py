@@ -4,6 +4,9 @@ from logging.config import fileConfig
 from sqlalchemy import engine_from_config, pool
 from alembic import context
 
+from app.core.database import Base
+import app.models  # noqa: F401
+
 config = context.config
 
 if config.config_file_name is not None:
@@ -12,9 +15,6 @@ if config.config_file_name is not None:
 # Override URL from environment if set
 db_url = os.getenv("DATABASE_URL", config.get_main_option("sqlalchemy.url"))
 config.set_main_option("sqlalchemy.url", db_url)
-
-from app.core.database import Base
-import app.models  # noqa: F401 — ensure all models are registered
 
 target_metadata = Base.metadata
 

@@ -71,7 +71,7 @@ def enqueue_deployment_webhooks(
     endpoints = (
         db.query(WebhookEndpoint)
         .filter(
-            WebhookEndpoint.is_active == True,
+            WebhookEndpoint.is_active.is_(True),
             WebhookEndpoint.event_type == EVENT_PROMPT_PRODUCTION_DEPLOYED,
         )
         .all()

@@ -1,5 +1,4 @@
 """Integration tests for prompt creation and metadata validation."""
-import pytest
 
 
 def _register_and_login(client, username="testuser", roles="author,reviewer,approver"):
@@ -22,10 +21,6 @@ def test_register_and_login(client):
 
 def test_create_prompt(client):
     token = _register_and_login(client)
-    # Get the user id
-    from app.models.user import User
-    from app.core.database import get_db
-    db = next(get_db())
 
     resp = client.post("/api/v1/prompts", headers=_headers(token), json={
         "name": "Release Note Generator",

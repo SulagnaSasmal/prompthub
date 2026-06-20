@@ -58,7 +58,7 @@ def register(body: UserCreate, db: Session = Depends(get_db)):
 @router.post("/login", response_model=Token)
 def login(body: LoginRequest, db: Session = Depends(get_db)):
     _rate_limit(f"login:{body.username.lower()}")
-    user = db.query(User).filter(User.username == body.username, User.is_active == True).first()
+    user = db.query(User).filter(User.username == body.username, User.is_active.is_(True)).first()
     if not user or not verify_password(body.password, user.hashed_password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
     token = create_access_token({"sub": str(user.user_id), "roles": user.roles})
@@ -68,7 +68,7 @@ def login(body: LoginRequest, db: Session = Depends(get_db)):
 @router.post("/forgot-password", response_model=ForgotPasswordOut)
 def forgot_password(body: ForgotPasswordRequest, db: Session = Depends(get_db)):
     _rate_limit(f"reset:{body.email.lower()}")
-    user = db.query(User).filter(User.email == body.email, User.is_active == True).first()
+    user = db.query(User).filter(User.email == body.email, User.is_active.is_(True)).first()
     message = "If an account exists for that email, a password reset link has been created."
     if not user:
         record_audit_event(db, event_type="password_reset.requested", target_type="user", payload={"email": body.email, "matched": False})
@@ -95,13 +95,13 @@ def reset_password(body: ResetPasswordRequest, db: Session = Depends(get_db)):
         db.query(PasswordResetToken)
         .filter(
             PasswordResetToken.token_hash == _hash_reset_token(body.token),
-            PasswordResetToken.used_at == None,
+            PasswordResetToken.used_at.is_(None),
         )
         .first()
     )
     if not reset or _as_aware(reset.expires_at) < datetime.now(timezone.utc):
         raise HTTPException(status_code=400, detail="Reset token is invalid or expired")
-    user = db.query(User).filter(User.user_id == reset.user_id, User.is_active == True).first()
+    user = db.query(User).filter(User.user_id == reset.user_id, User.is_active.is_(True)).first()
     if not user:
         raise HTTPException(status_code=400, detail="Reset token is invalid or expired")
     user.hashed_password = hash_password(body.new_password)

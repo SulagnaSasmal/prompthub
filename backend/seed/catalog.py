@@ -11,8 +11,6 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from datetime import datetime, timezone
-from uuid import uuid4
-
 from app.core.database import Base, SessionLocal, engine
 from app.core.security import hash_password
 from app.models.user import User
@@ -800,7 +798,6 @@ def seed():
             db.add(prompt)
             db.flush()
 
-            prev_version = None
             for i, vd in enumerate(pd["versions"]):
                 is_last = i == len(pd["versions"]) - 1
                 status = "Production" if is_last else "Retired"
@@ -856,7 +853,7 @@ def seed():
                         is_adversarial = tc_i == tc_count - 1 and pd["risk_level"] == "High"
                         tc = TestCase(
                             version_id=v.version_id,
-                            name=f"adversarial: malicious input injection" if is_adversarial else f"Test case {tc_i + 1}",
+                            name="adversarial: malicious input injection" if is_adversarial else f"Test case {tc_i + 1}",
                             input=f"Sample input {tc_i + 1} for {pd['name']}",
                             expected_behavior=f"Expected output {tc_i + 1}",
                             result="Pass",
@@ -893,8 +890,6 @@ def seed():
                             comment=f"Promoted to {to_s}",
                         )
                         db.add(wl)
-
-                prev_version = v
 
             db.commit()
             print(f"  Seeded: {pd['name']} ({len(pd['versions'])} version(s))")

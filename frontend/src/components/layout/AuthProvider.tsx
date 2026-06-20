@@ -12,30 +12,29 @@ interface AuthCtx {
 const Ctx = createContext<AuthCtx>({ token: null, user: null, login: () => {}, logout: () => {} });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [token, setToken] = useState<string | null>(() => {
-    if (typeof window === "undefined") return null;
-    return localStorage.getItem("token");
-  });
-  const [user, setUser] = useState<User | null>(() => {
-    if (typeof window === "undefined") return null;
-    const stored = localStorage.getItem("user");
-    if (!stored) return null;
-    try {
-      return JSON.parse(stored);
-    } catch {
-      return null;
-    }
-  });
+  const [token, setToken] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    const stored = localStorage.getItem("user");
-    if (stored) {
-      try {
-        JSON.parse(stored);
-      } catch {
-        localStorage.removeItem("user");
+    let isActive = true;
+
+    Promise.resolve().then(() => {
+      if (!isActive) return;
+      setToken(localStorage.getItem("token"));
+      const stored = localStorage.getItem("user");
+      if (stored) {
+        try {
+          setUser(JSON.parse(stored));
+        } catch {
+          localStorage.removeItem("user");
+          setUser(null);
+        }
       }
-    }
+    });
+
+    return () => {
+      isActive = false;
+    };
   }, []);
 
   function login(t: string, u: User) {

@@ -4,7 +4,6 @@ from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.dependencies import get_current_user
-from app.models.evaluation import Evaluation
 from app.models.governance import GovernanceCheck
 from app.models.prompt import Prompt
 from app.models.user import User
