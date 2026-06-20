@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import type { Prompt } from "@/lib/types";
+import { PageHelp } from "@/components/help/PageHelp";
 import { PromptCard } from "@/components/prompts/PromptCard";
 
 const CATEGORIES = ["All", "Documentation", "Support", "Product Management", "Compliance"];
@@ -65,6 +66,19 @@ export default function LibraryPage() {
         >
           + New Workflow
         </Link>
+      </div>
+
+      <div className="mb-6">
+        <PageHelp
+          title="Use this page to find the right governed workflow."
+          description="The library is the starting point for writers, reviewers, and admins who need approved reusable prompt workflows."
+          steps={[
+            "Search by workflow name, description, or tag when you already know what you need.",
+            "Filter by category, task type, status, or risk to narrow the list.",
+            "Open a workflow card to review its current version, examples, tests, and run form.",
+            "Use New Workflow when no existing workflow covers the writing job.",
+          ]}
+        />
       </div>
 
       {/* Filters */}

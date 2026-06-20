@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import type { DashboardMetrics } from "@/lib/types";
+import { PageHelp } from "@/components/help/PageHelp";
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend,
@@ -50,6 +51,17 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-slate-900">Dashboard</h2>
+
+      <PageHelp
+        title="Use this page to understand workspace health."
+        description="The dashboard summarizes workflow adoption, approval coverage, quality signals, risk, and items that need attention."
+        steps={[
+          "Review the top metrics first to understand total workflows, approvals, quality, and open flags.",
+          "Use the charts to spot concentration by category or risk level.",
+          "Open frequently viewed workflows from the table when usage suggests they need maintenance.",
+          "Follow up on open governance flags or failed workflows from the library and review queue.",
+        ]}
+      />
 
       {/* Stat cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">

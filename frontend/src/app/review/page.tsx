@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { api } from "@/lib/api";
 import type { ReviewQueueItem } from "@/lib/types";
+import { PageHelp } from "@/components/help/PageHelp";
 import { AlertTriangle, CheckCircle2, ClipboardCheck } from "lucide-react";
 
 const SECTIONS = [
@@ -101,6 +102,17 @@ export default function ReviewQueuePage() {
           {SECTIONS.map((name) => <option key={name}>{name}</option>)}
         </select>
       </div>
+
+      <PageHelp
+        title="Use this page to move workflows through review."
+        description="The queue groups workflow versions by the next missing quality, test, example, governance, or approval action."
+        steps={[
+          "Select a queue section or use All to see every item waiting for action.",
+          "Open a workflow to inspect examples, evaluations, governance checks, and comments.",
+          "Use the primary action only after the missing requirements are resolved.",
+          "Return a workflow to the previous status when it needs author changes.",
+        ]}
+      />
 
       <div className="grid gap-3 md:grid-cols-4">
         {SECTIONS.map((name) => (

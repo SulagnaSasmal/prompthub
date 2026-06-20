@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/api";
+import { PageHelp } from "@/components/help/PageHelp";
 import { useAuth } from "@/components/layout/AuthProvider";
 
 export default function LoginPage() {
@@ -184,6 +185,18 @@ export default function LoginPage() {
         >
           {mode === "login" ? "Create an author account" : "Use an existing account"}
         </button>
+        <div className="mt-6">
+          <PageHelp
+            title="Use this page to access PromptHub."
+            description="Sign in to your workspace, create an author account for demos, or reset a password with the reset flow."
+            steps={[
+              "Use Sign in when you already have a username and password.",
+              "Choose Create an author account when you need a new demo or contributor account.",
+              "Choose Forgot password when you need a reset token and then set a new password.",
+              "After sign-in, open Working Library to find or create workflows.",
+            ]}
+          />
+        </div>
       </div>
     </div>
   );

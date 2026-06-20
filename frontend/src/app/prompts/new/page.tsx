@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/api";
 import type { RiskLevel } from "@/lib/types";
+import { PageHelp } from "@/components/help/PageHelp";
 
 const CATEGORIES = ["Documentation", "Support", "Product Management", "Compliance"];
 const RISKS: RiskLevel[] = ["Low", "Medium", "High"];
@@ -56,6 +57,19 @@ export default function NewPromptPage() {
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-slate-900">New Workflow</h2>
         <p className="mt-1 text-sm text-slate-500">Create a governed writing workflow for review, testing, and reuse.</p>
+      </div>
+
+      <div className="mb-6">
+        <PageHelp
+          title="Use this page to create the workflow record."
+          description="This creates the governed container for a writing task; the prompt template, variables, examples, and tests are managed after creation."
+          steps={[
+            "Name the workflow for the writing outcome, such as release notes or API summary.",
+            "Add a clear description, category, task type, risk level, and tags.",
+            "Write usage notes that tell future users when the workflow is appropriate.",
+            "Create the workflow, then open it to add versions, variables, examples, and governance checks.",
+          ]}
+        />
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5 bg-white rounded-lg border border-slate-200 p-6">

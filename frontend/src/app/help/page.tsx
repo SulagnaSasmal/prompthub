@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { PageHelp } from "@/components/help/PageHelp";
 import { BookOpen, CheckCircle2, ClipboardList, Play, ShieldCheck } from "lucide-react";
 
 const quickStart = [
@@ -25,6 +26,17 @@ export default function HelpPage() {
         <h2 className="text-2xl font-bold text-slate-900">PromptHub Manual</h2>
         <p className="mt-1 text-sm text-slate-500">A practical guide for working with governed writing workflows.</p>
       </div>
+
+      <PageHelp
+        title="Use this page as the full application manual."
+        description="The manual explains the workflow lifecycle, roles, common tasks, and quality checklist; each application page also has its own focused help panel."
+        steps={[
+          "Start with Quick start when you are new to the workspace.",
+          "Use Role guide to understand which actions belong to writers, authors, reviewers, approvers, and admins.",
+          "Open a task card when you need instructions for creating, running, or approving workflows.",
+          "Use the page-level help panel on any screen when you need steps for that exact page.",
+        ]}
+      />
 
       <section className="grid gap-4 md:grid-cols-4">
         <ManualLink href="/library" icon={<BookOpen className="h-5 w-5" />} title="Find Workflows" text="Browse approved writing tasks." />

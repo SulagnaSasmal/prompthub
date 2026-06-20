@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import type { WorkflowPack } from "@/lib/types";
+import { PageHelp } from "@/components/help/PageHelp";
 import { PackagePlus } from "lucide-react";
 
 export default function WorkflowPacksPage() {
@@ -62,6 +63,18 @@ export default function WorkflowPacksPage() {
         <h2 className="text-2xl font-bold text-slate-900">Workflow Packs</h2>
         <p className="mt-1 text-sm text-slate-500">Importable workflow sets with provenance and license metadata.</p>
       </div>
+
+      <PageHelp
+        title="Use this page to stage reusable workflow packs."
+        description="Workflow packs let admins bring in sets of prompts or templates while preserving provenance, license, and review status."
+        steps={[
+          "Enter the pack name, source URL, and license before importing.",
+          "Import new packs as Draft so admins can review contents before activation.",
+          "Check installed packs for provenance and current status.",
+          "Move useful workflows from reviewed packs into the governed library process.",
+        ]}
+        note="External prompt libraries should be reviewed for license, data handling, and prompt safety before broad use."
+      />
 
       {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
       {message && <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{message}</p>}

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import type { WebhookDelivery, WebhookEndpoint } from "@/lib/types";
+import { PageHelp } from "@/components/help/PageHelp";
 import { RotateCw, Save, ToggleLeft, ToggleRight } from "lucide-react";
 
 export default function AdminPage() {
@@ -90,6 +91,18 @@ export default function AdminPage() {
           New workflow
         </Link>
       </div>
+
+      <PageHelp
+        title="Use this page to manage deployment webhooks."
+        description="Admins configure endpoints that receive signed events when workflow versions move into production."
+        steps={[
+          "Create a webhook with a clear name, HTTPS URL, and shared HMAC secret.",
+          "Keep only endpoints that should receive production deployment events marked active.",
+          "Watch recent deliveries for failed attempts, response codes, and retry timing.",
+          "Retry due or failed deliveries after the receiving service has been fixed.",
+        ]}
+        note="Webhook secrets should match the receiving system and should not be pasted into public tickets or comments."
+      />
 
       {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
       {message && <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{message}</p>}

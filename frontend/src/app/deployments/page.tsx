@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import type { DeploymentSummary, WebhookDelivery } from "@/lib/types";
+import { PageHelp } from "@/components/help/PageHelp";
 import { RotateCw, Rocket } from "lucide-react";
 
 export default function DeploymentsPage() {
@@ -66,6 +67,17 @@ export default function DeploymentsPage() {
           Configure webhooks
         </Link>
       </div>
+
+      <PageHelp
+        title="Use this page to monitor production workflow delivery."
+        description="Deployments shows production workflow versions and the webhook delivery status that keeps downstream systems in sync."
+        steps={[
+          "Review each production workflow for current version, risk, run count, and webhook status.",
+          "Open workflows that show unexpected risk or usage before changing their production status.",
+          "Check delivery history when an endpoint did not receive a deployment event.",
+          "Replay due or failed deliveries after confirming the webhook endpoint is healthy.",
+        ]}
+      />
 
       {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
       {message && <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{message}</p>}

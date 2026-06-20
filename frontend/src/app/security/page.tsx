@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import type { EnterpriseAuthConfig, RetentionPolicy } from "@/lib/types";
+import { PageHelp } from "@/components/help/PageHelp";
 import { KeyRound, Save, Shield } from "lucide-react";
 
 export default function SecurityPage() {
@@ -87,6 +88,18 @@ export default function SecurityPage() {
         <h2 className="text-2xl font-bold text-slate-900">Security</h2>
         <p className="mt-1 text-sm text-slate-500">Retention, private-source storage, and enterprise identity readiness.</p>
       </div>
+
+      <PageHelp
+        title="Use this page to set data handling and identity controls."
+        description="Security settings define how long run data is retained, how private source material is stored, and how enterprise identity will connect."
+        steps={[
+          "Create retention policies that match the type of data being stored.",
+          "Prefer reference-only private source storage unless the business needs retained content.",
+          "Create OIDC or SAML configs as drafts before using them for live authentication.",
+          "Review saved policies and auth configs after every change to confirm the active settings.",
+        ]}
+        note="Treat client secrets and identity configuration as production credentials."
+      />
 
       {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
       {message && <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{message}</p>}
