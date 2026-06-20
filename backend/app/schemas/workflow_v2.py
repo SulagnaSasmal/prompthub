@@ -154,6 +154,45 @@ class IntegrationFetchOut(BaseModel):
     content: str
 
 
+class IntegrationCapabilityOut(BaseModel):
+    source: str
+    status: str
+    capabilities: list[str]
+    guidance: str
+
+
+class RunExportOut(BaseModel):
+    run_id: UUID
+    filename: str
+    target_type: str
+    content: str
+
+
+class ReviewQueueItemOut(BaseModel):
+    version_id: UUID
+    prompt_id: UUID
+    workflow_name: str
+    version_number: str
+    status: str
+    owner_id: UUID
+    risk_level: str
+    queue_section: str
+    missing_requirements: list[str]
+    primary_action: str
+    last_activity: datetime
+
+
+class DeploymentSummaryOut(BaseModel):
+    prompt_id: UUID
+    workflow_name: str
+    current_version: str | None
+    risk_level: str
+    run_count: int
+    webhook_delivery_status: str
+    failed_deliveries: int
+    updated_at: datetime
+
+
 class CommentIn(BaseModel):
     target_type: str
     target_id: UUID

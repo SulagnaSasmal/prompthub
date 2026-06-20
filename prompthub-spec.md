@@ -552,6 +552,79 @@ The project is complete when all of the following are demonstrable end to end:
 
 ---
 
+## 18. Implementation Status Audit
+
+**Audit date:** June 20, 2026
+**Status key:** Done = implemented and testable in the current app. Partial = a usable slice exists, but the full spec is not complete. Pending = not implemented yet.
+
+### 18.1 Goals
+
+| ID | Item | Status |
+|----|------|--------|
+| G1 | Single source of truth for enterprise prompts/workflows | Done |
+| G2 | Full version history for every prompt/workflow | Done |
+| G3 | Measurable prompt quality | Done |
+| G4 | Enforced approval workflow before production use | Done |
+| G5 | Repeatable prompt testing | Done |
+| G6 | Governance and risk visibility | Done |
+| G7 | Executive visibility through dashboard metrics | Done |
+
+### 18.2 Core Feature Areas
+
+| Area | Status | Notes |
+|------|--------|-------|
+| Users and roles | Done | JWT auth and role checks exist for consumer, author, reviewer, and approver behavior. |
+| Prompt asset model | Done | Metadata, owner, status, model, risk, tags, task type, and usage notes are captured. |
+| Category taxonomy | Done | Default categories are available; administrator-extensible taxonomy UI is pending. |
+| Metadata validation | Done | Required metadata and duplicate-name checks exist. |
+| Semantic versioning | Done | Versions are created, copied forward for tests, and diffable. |
+| Immutable version behavior after submission | Partial | Workflow rules prevent unsafe transitions, but edit locking is not fully surfaced in UI. |
+| Version diff UI | Done | Detail page includes version comparison. |
+| Evaluation framework | Done | Weighted scorecards are stored and rendered. |
+| Score thresholds | Done | Workflow transition logic enforces hard failure below threshold. |
+| Lifecycle workflow | Done | Draft, In Review, Testing, Approved, Production, and Retired transitions exist. |
+| Separation of duties | Done | Version authors cannot approve their own version into Testing/Production. |
+| Audit trail | Done | Workflow log and audit export exist. |
+| Test suites | Done | Test cases, pass/fail/not-run status, and promotion from runs exist. |
+| Governance checks | Done | PII, Compliance, Bias, Hallucination, and Ownership checks are modeled and enforced where required. |
+| Dashboard | Done | Health, risk, category, quality, view, and failure metrics are present. |
+| Documentation portal | Done | MkDocs documentation set exists under `docs/`. |
+| Architecture guide | Done | Included in docs. |
+| API reference | Partial | FastAPI OpenAPI is available; generated docs portal integration is pending. |
+| Release notes | Done | Included in docs. |
+| Prompt design standards | Done | Included in docs. |
+| Local Docker portability | Done | `docker-compose.yml` exists and has been verified locally. |
+| Accessibility basics | Partial | Labels, contrast, and keyboard-friendly controls are mostly present; formal WCAG audit is pending. |
+
+### 18.3 Portfolio Deliverables Checklist
+
+| Deliverable | Status |
+|-------------|--------|
+| GitHub repository with source code, docker-compose, and CI lint | Done |
+| Architecture diagram with source committed | Pending |
+| Demo video, 5 to 10 minutes | Pending |
+| Documentation portal with all seven documents | Done |
+| Prompt catalog with 20 to 30 governed enterprise prompts | Done |
+| Evaluation framework with worked scorecards | Done |
+| Governance model with workflow, checks, and audit export | Done |
+
+### 18.4 Acceptance Criteria
+
+| # | Criterion | Status |
+|---|-----------|--------|
+| 1 | Prompt/workflow can be created with full metadata and blocked when required fields are missing | Done |
+| 2 | Three Release Notes Generator versions exist and diff view compares versions | Done |
+| 3 | Failed test case blocks advancement out of Testing | Done |
+| 4 | Low evaluation score rejects or blocks approval with logged comment | Done |
+| 5 | Version author cannot approve their own version | Done |
+| 6 | Promoting a successor to Production retires previous Production version | Done |
+| 7 | Audit log shows transitions and exports CSV | Done |
+| 8 | PII governance Fail blocks promotion | Done |
+| 9 | Dashboard renders all eight metrics against seeded catalog | Done |
+| 10 | Fresh user can complete create-and-submit flow using only guide material | Partial |
+
+---
+
 ## Appendix A: Glossary
 
 | Term | Definition |

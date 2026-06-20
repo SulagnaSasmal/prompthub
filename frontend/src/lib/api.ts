@@ -166,6 +166,10 @@ export const api = {
         method: "POST",
         body: JSON.stringify({ note }),
       }),
+    exportRun: (runId: string) =>
+      request<import("./types").RunExport>(`/runs/${runId}/export`, {
+        method: "POST",
+      }),
     styleProfiles: () => request<import("./types").StyleProfile[]>("/style-profiles"),
     createStyleProfile: (data: object) =>
       request<import("./types").StyleProfile>("/style-profiles", {
@@ -186,6 +190,9 @@ export const api = {
         method: "POST",
         body: JSON.stringify(data),
       }),
+    integrations: () => request<import("./types").IntegrationCapability[]>("/integrations"),
+    reviewQueue: () => request<import("./types").ReviewQueueItem[]>("/review-queue"),
+    deployments: () => request<import("./types").DeploymentSummary[]>("/deployments"),
     comments: (target_type: string, target_id: string) =>
       request<import("./types").Comment[]>(`/comments?${new URLSearchParams({ target_type, target_id })}`),
     createComment: (data: object) =>

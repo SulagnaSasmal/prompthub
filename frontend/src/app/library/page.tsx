@@ -63,7 +63,7 @@ export default function LibraryPage() {
           href="/prompts/new"
           className="bg-brand-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-700 transition-colors"
         >
-          + New Prompt
+          + New Workflow
         </Link>
       </div>
 

@@ -134,6 +134,45 @@ export interface Comment {
   created_at: string;
 }
 
+export interface IntegrationCapability {
+  source: string;
+  status: string;
+  capabilities: string[];
+  guidance: string;
+}
+
+export interface RunExport {
+  run_id: string;
+  filename: string;
+  target_type: "markdown";
+  content: string;
+}
+
+export interface ReviewQueueItem {
+  version_id: string;
+  prompt_id: string;
+  workflow_name: string;
+  version_number: string;
+  status: Status;
+  owner_id: string;
+  risk_level: RiskLevel;
+  queue_section: string;
+  missing_requirements: string[];
+  primary_action: string;
+  last_activity: string;
+}
+
+export interface DeploymentSummary {
+  prompt_id: string;
+  workflow_name: string;
+  current_version?: string;
+  risk_level: RiskLevel;
+  run_count: number;
+  webhook_delivery_status: string;
+  failed_deliveries: number;
+  updated_at: string;
+}
+
 export interface WebhookEndpoint {
   webhook_id: string;
   name: string;

@@ -379,6 +379,108 @@ The upgrade is complete when all of the following are demonstrable:
 
 ---
 
-## 12. The One-Sentence Statement of the Upgrade
+## 12. Implementation Status Audit
+
+**Audit date:** June 20, 2026
+**Status key:** Done = implemented and testable in the current app. Partial = a usable slice exists, but the full spec is not complete. Pending = not implemented yet.
+
+### 12.1 Information Architecture
+
+| Item | Status |
+|------|--------|
+| Working Library as default signed-in surface | Done |
+| Run History | Done |
+| Dashboard retained for governance visibility | Done |
+| Admin area | Done |
+| Review Queue | Done |
+| Style Profiles | Done |
+| Integrations | Done |
+| Deployments | Done |
+| In-app manual/help | Done |
+
+### 12.2 Feature Specifications
+
+| Feature | Status | Notes |
+|---------|--------|-------|
+| Prompt Runner | Done | Workflows can be run from the detail page through the backend gateway. |
+| Server-side model gateway boundary | Partial | Gateway exists and blocks direct browser provider calls; real provider execution is v3 pending. |
+| Run persistence | Done | Runs store input payload, output, model, latency, governance result, user, and timestamp. |
+| Runner guardrails | Done | Consumers can only run Approved or Production versions; PII/compliance blocks are logged. |
+| Template variables | Done | Variables are declared, validated against prompt text, rendered as inputs, and required fields block runs. |
+| Examples library | Done | Examples exist and runs can be promoted to examples. |
+| Mandatory example before approval | Done | Transition to Approved checks for at least one example. |
+| Output evaluation from real usage | Done | Structured ratings and field-quality signal exist. |
+| Test cases from runs | Done | Reviewer/approver can promote a run into a test case. |
+| Markdown/file source input | Done | Markdown and pasted source are accepted in source fetch and runner input. |
+| GitHub source input | Done | Public GitHub URLs can be fetched read-only for issues, PRs, commits, blobs, and repository summaries. |
+| Jira source input | Partial | UI/API accept Jira locators and pasted content; live Jira authentication/fetch is pending. |
+| OpenAPI source input | Partial | Pasted spec content is accepted; URL fetch and diff parser are pending. |
+| Style Guide and Terminology Integration | Done | Style profiles, rules, attachment, runtime injection, and style checks exist. |
+| Collaboration comments | Done | Comments can be added to workflow versions. |
+
+### 12.3 Data Model Additions
+
+| Table/Field | Status |
+|-------------|--------|
+| workflows extension fields on prompts | Done |
+| variables | Done |
+| runs | Done |
+| run_ratings | Done |
+| examples | Done |
+| style_profiles | Done |
+| style_rules | Done |
+| comments | Done |
+
+### 12.4 API Additions
+
+| Endpoint | Status |
+|----------|--------|
+| `POST /versions/{id}/run` | Done |
+| `GET /runs` | Done |
+| `POST /runs/{id}/rating` | Done |
+| `POST /runs/{id}/promote-example` | Done |
+| `POST /runs/{id}/promote-test` | Done |
+| `GET/POST /versions/{id}/variables` | Done |
+| `GET/POST /versions/{id}/examples` | Done |
+| `GET/POST /style-profiles` | Done |
+| `POST /style-check` | Done |
+| `POST /integrations/{source}/fetch` | Done |
+| `GET/POST /comments` | Done |
+
+### 12.5 Build Plan
+
+| Phase | Status |
+|-------|--------|
+| 1. Schema additions, model gateway service, run persistence | Done |
+| 2. Template variables | Done |
+| 3. Prompt Runner end to end | Done |
+| 4. Output rating loop and promote-to-example/test | Done |
+| 5. Examples library surface | Done |
+| 6. Working Library IA and writer-native UX pass | Done |
+| 7. Style Profiles and Style Check | Done |
+| 8. Source integrations | Partial |
+| 9. Comments | Done |
+| 10. Documentation update and demo video | Partial |
+
+### 12.6 Acceptance Criteria
+
+| # | Criterion | Status |
+|---|-----------|--------|
+| 1 | Writer signs in and lands on Working Library | Done |
+| 2 | Writer opens approved workflow, fills variables, runs it, sees output | Done |
+| 3 | Required variable left empty blocks run | Done |
+| 4 | Output generated through server-side gateway | Done |
+| 5 | PII/compliance run block returns reason and logs attempt | Done |
+| 6 | Writer rates output and field-quality signal updates | Done |
+| 7 | Highly rated run can be promoted to example and test | Done |
+| 8 | Workflow cannot be Approved without example | Done |
+| 9 | Style Profile flags banned phrase and can be injected at runtime | Done |
+| 10 | Release-notes workflow pulls Jira ticket as input | Partial |
+| 11 | v1 governance capabilities still pass | Done |
+| 12 | Fresh writer completes find-run-adapt-improve using only User Guide | Partial |
+
+---
+
+## 13. The One-Sentence Statement of the Upgrade
 
 PromptHub stops being GitHub for prompts and becomes a governed prompt workspace for documentation teams, where approved writing workflows can be run, tested, improved, and reused, with governance wrapping the work instead of guarding the door.

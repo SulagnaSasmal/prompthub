@@ -7,8 +7,13 @@ import clsx from "clsx";
 const nav = [
   { href: "/library", label: "Working Library" },
   { href: "/runs", label: "Run History" },
+  { href: "/review", label: "Review Queue" },
+  { href: "/style-profiles", label: "Style Profiles" },
+  { href: "/integrations", label: "Integrations" },
+  { href: "/deployments", label: "Deployments" },
   { href: "/dashboard", label: "Dashboard" },
   { href: "/admin", label: "Admin" },
+  { href: "/help", label: "Help" },
 ];
 
 export function Sidebar() {

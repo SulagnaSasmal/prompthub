@@ -7,6 +7,7 @@ import type { RiskLevel } from "@/lib/types";
 
 const CATEGORIES = ["Documentation", "Support", "Product Management", "Compliance"];
 const RISKS: RiskLevel[] = ["Low", "Medium", "High"];
+const TASK_TYPES = ["Release Notes", "API Summary", "Migration Guide", "KB Article", "Tone Rewrite", "Style Check", "Documentation Draft", "General Writing"];
 
 export default function NewPromptPage() {
   const router = useRouter();
@@ -17,6 +18,8 @@ export default function NewPromptPage() {
     subcategory: "",
     target_model: "GPT-5",
     risk_level: "Medium" as RiskLevel,
+    task_type: "General Writing",
+    usage_notes: "",
     tags: "",
   });
   const [error, setError] = useState("");
@@ -51,8 +54,8 @@ export default function NewPromptPage() {
   return (
     <div className="max-w-3xl">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-slate-900">New Prompt</h2>
-        <p className="mt-1 text-sm text-slate-500">Create a governed prompt record for review and testing.</p>
+        <h2 className="text-2xl font-bold text-slate-900">New Workflow</h2>
+        <p className="mt-1 text-sm text-slate-500">Create a governed writing workflow for review, testing, and reuse.</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5 bg-white rounded-lg border border-slate-200 p-6">
@@ -102,6 +105,20 @@ export default function NewPromptPage() {
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">
+          <Field label="Task type">
+            <select
+              value={form.task_type}
+              onChange={(event) => update("task_type", event.target.value)}
+              className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+            >
+              {TASK_TYPES.map((taskType) => (
+                <option key={taskType} value={taskType}>
+                  {taskType}
+                </option>
+              ))}
+            </select>
+          </Field>
+
           <Field label="Target model">
             <input
               value={form.target_model}
@@ -125,6 +142,16 @@ export default function NewPromptPage() {
             </select>
           </Field>
         </div>
+
+        <Field label="Usage notes">
+          <textarea
+            value={form.usage_notes}
+            onChange={(event) => update("usage_notes", event.target.value)}
+            rows={3}
+            placeholder="When to use this workflow and what source material works best."
+            className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+          />
+        </Field>
 
         <Field label="Tags">
           <input
@@ -150,7 +177,7 @@ export default function NewPromptPage() {
             disabled={loading}
             className="rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-700 disabled:opacity-60"
           >
-            {loading ? "Creating..." : "Create prompt"}
+            {loading ? "Creating..." : "Create workflow"}
           </button>
         </div>
       </form>

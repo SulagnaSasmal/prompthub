@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 480
     cors_origins: str = "*"
+    github_token: str | None = None
 
     class Config:
         env_file = ".env"

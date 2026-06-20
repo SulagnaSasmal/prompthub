@@ -21,7 +21,7 @@ import { StatusBadge } from "@/components/prompts/StatusBadge";
 import { RiskBadge } from "@/components/prompts/RiskBadge";
 import { ScoreCard } from "@/components/evaluation/ScoreCard";
 import { VersionDiff } from "@/components/prompts/VersionDiff";
-import { CheckCircle2, Copy, MessageSquare, Play, Save, ShieldCheck, Sparkles } from "lucide-react";
+import { CheckCircle2, Copy, Download, MessageSquare, Play, Save, ShieldCheck, Sparkles } from "lucide-react";
 
 const RATING_TAGS = ["Useful", "Inaccurate", "Too verbose", "Wrong tone", "Missing details", "Hallucinated content"];
 
@@ -130,6 +130,19 @@ export default function PromptDetailPage() {
       setTestCases((prev) => [testCase, ...prev]);
       setMessage("Run promoted to a test case.");
     }
+  }
+
+  async function exportMarkdown() {
+    if (!run) return;
+    const exported = await api.workflows.exportRun(run.run_id);
+    const blob = new Blob([exported.content], { type: "text/markdown;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = exported.filename;
+    link.click();
+    URL.revokeObjectURL(url);
+    setMessage("Markdown export downloaded.");
   }
 
   async function fetchSource() {
@@ -310,6 +323,9 @@ export default function PromptDetailPage() {
               <div className="flex flex-wrap gap-2">
                 <button onClick={() => navigator.clipboard.writeText(run?.output_text || "")} className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700">
                   <Copy className="h-4 w-4" /> Copy
+                </button>
+                <button onClick={exportMarkdown} disabled={!run} className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 disabled:opacity-50">
+                  <Download className="h-4 w-4" /> Markdown
                 </button>
                 <button onClick={() => promote("example")} disabled={!run?.output_text} className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 disabled:opacity-50">
                   <Save className="h-4 w-4" /> Example
