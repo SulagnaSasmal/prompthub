@@ -83,20 +83,21 @@ export default function StyleProfilesPage() {
   return (
     <div className="max-w-6xl space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-slate-900">Style Profiles</h2>
+        <div className="flex items-center gap-2">
+          <h2 className="text-2xl font-bold text-slate-900">Style Profiles</h2>
+          <PageHelp
+            title="Use this page to manage writing style rules."
+            description="Style profiles capture banned phrases, preferred terminology, voice guidance, and formatting checks for generated output."
+            steps={[
+              "Create a profile rule with a pattern, message, rule type, and severity.",
+              "Review configured profiles to make sure terminology rules match the team standard.",
+              "Paste sample output into the style checker and choose a profile.",
+              "Attach approved profiles to workflows from the workflow detail page when runtime checks should apply.",
+            ]}
+          />
+        </div>
         <p className="mt-1 text-sm text-slate-500">Governed terminology, voice, and formatting rules for generated writing.</p>
       </div>
-
-      <PageHelp
-        title="Use this page to manage writing style rules."
-        description="Style profiles capture banned phrases, preferred terminology, voice guidance, and formatting checks for generated output."
-        steps={[
-          "Create a profile rule with a pattern, message, rule type, and severity.",
-          "Review configured profiles to make sure terminology rules match the team standard.",
-          "Paste sample output into the style checker and choose a profile.",
-          "Attach approved profiles to workflows from the workflow detail page when runtime checks should apply.",
-        ]}
-      />
 
       {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
       {message && <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{message}</p>}

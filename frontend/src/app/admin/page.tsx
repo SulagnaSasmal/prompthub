@@ -84,25 +84,26 @@ export default function AdminPage() {
     <div className="max-w-6xl space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Admin</h2>
+          <div className="flex items-center gap-2">
+            <h2 className="text-2xl font-bold text-slate-900">Admin</h2>
+            <PageHelp
+              title="Use this page to manage deployment webhooks."
+              description="Admins configure endpoints that receive signed events when workflow versions move into production."
+              steps={[
+                "Create a webhook with a clear name, HTTPS URL, and shared HMAC secret.",
+                "Keep only endpoints that should receive production deployment events marked active.",
+                "Watch recent deliveries for failed attempts, response codes, and retry timing.",
+                "Retry due or failed deliveries after the receiving service has been fixed.",
+              ]}
+              note="Webhook secrets should match the receiving system and should not be pasted into public tickets or comments."
+            />
+          </div>
           <p className="mt-1 text-sm text-slate-500">Configure deployment webhooks for production workflow changes.</p>
         </div>
         <Link href="/prompts/new" className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700">
           New workflow
         </Link>
       </div>
-
-      <PageHelp
-        title="Use this page to manage deployment webhooks."
-        description="Admins configure endpoints that receive signed events when workflow versions move into production."
-        steps={[
-          "Create a webhook with a clear name, HTTPS URL, and shared HMAC secret.",
-          "Keep only endpoints that should receive production deployment events marked active.",
-          "Watch recent deliveries for failed attempts, response codes, and retry timing.",
-          "Retry due or failed deliveries after the receiving service has been fixed.",
-        ]}
-        note="Webhook secrets should match the receiving system and should not be pasted into public tickets or comments."
-      />
 
       {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
       {message && <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{message}</p>}

@@ -94,7 +94,19 @@ export default function ReviewQueuePage() {
     <div className="max-w-7xl space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Review Queue</h2>
+          <div className="flex items-center gap-2">
+            <h2 className="text-2xl font-bold text-slate-900">Review Queue</h2>
+            <PageHelp
+              title="Use this page to move workflows through review."
+              description="The queue groups workflow versions by the next missing quality, test, example, governance, or approval action."
+              steps={[
+                "Select a queue section or use All to see every item waiting for action.",
+                "Open a workflow to inspect examples, evaluations, governance checks, and comments.",
+                "Use the primary action only after the missing requirements are resolved.",
+                "Return a workflow to the previous status when it needs author changes.",
+              ]}
+            />
+          </div>
           <p className="mt-1 text-sm text-slate-500">Focused work for workflow versions that need review, tests, examples, or approval.</p>
         </div>
         <select value={section} onChange={(event) => setSection(event.target.value)} className="rounded-lg border border-slate-200 px-3 py-2 text-sm">
@@ -102,17 +114,6 @@ export default function ReviewQueuePage() {
           {SECTIONS.map((name) => <option key={name}>{name}</option>)}
         </select>
       </div>
-
-      <PageHelp
-        title="Use this page to move workflows through review."
-        description="The queue groups workflow versions by the next missing quality, test, example, governance, or approval action."
-        steps={[
-          "Select a queue section or use All to see every item waiting for action.",
-          "Open a workflow to inspect examples, evaluations, governance checks, and comments.",
-          "Use the primary action only after the missing requirements are resolved.",
-          "Return a workflow to the previous status when it needs author changes.",
-        ]}
-      />
 
       <div className="grid gap-3 md:grid-cols-4">
         {SECTIONS.map((name) => (

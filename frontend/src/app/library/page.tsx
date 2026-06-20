@@ -57,7 +57,19 @@ export default function LibraryPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Working Library</h2>
+          <div className="flex items-center gap-2">
+            <h2 className="text-2xl font-bold text-slate-900">Working Library</h2>
+            <PageHelp
+              title="Use this page to find the right governed workflow."
+              description="The library is the starting point for writers, reviewers, and admins who need approved reusable prompt workflows."
+              steps={[
+                "Search by workflow name, description, or tag when you already know what you need.",
+                "Filter by category, task type, status, or risk to narrow the list.",
+                "Open a workflow card to review its current version, examples, tests, and run form.",
+                "Use New Workflow when no existing workflow covers the writing job.",
+              ]}
+            />
+          </div>
           <p className="text-sm text-slate-500 mt-0.5">{filtered.length} runnable and governed workflows</p>
         </div>
         <Link
@@ -66,19 +78,6 @@ export default function LibraryPage() {
         >
           + New Workflow
         </Link>
-      </div>
-
-      <div className="mb-6">
-        <PageHelp
-          title="Use this page to find the right governed workflow."
-          description="The library is the starting point for writers, reviewers, and admins who need approved reusable prompt workflows."
-          steps={[
-            "Search by workflow name, description, or tag when you already know what you need.",
-            "Filter by category, task type, status, or risk to narrow the list.",
-            "Open a workflow card to review its current version, examples, tests, and run form.",
-            "Use New Workflow when no existing workflow covers the writing job.",
-          ]}
-        />
       </div>
 
       {/* Filters */}

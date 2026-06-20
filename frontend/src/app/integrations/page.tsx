@@ -107,21 +107,22 @@ export default function IntegrationsPage() {
   return (
     <div className="max-w-6xl space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-slate-900">Integrations</h2>
+        <div className="flex items-center gap-2">
+          <h2 className="text-2xl font-bold text-slate-900">Integrations</h2>
+          <PageHelp
+            title="Use this page to connect source material safely."
+            description="Integrations fetch or reference Markdown, GitHub, Jira, Confluence, and OpenAPI material without turning PromptHub into the system of record."
+            steps={[
+              "Review available capabilities so you know which sources can be fetched.",
+              "Save a named connection when a provider requires a token or shared secret.",
+              "Fetch source content by URL, key, reference, file upload, or pasted text.",
+              "Use OpenAPI diff when a workflow needs to explain API changes between two specs.",
+            ]}
+            note="Source references should stay reference-only unless a retention policy explicitly allows stored content."
+          />
+        </div>
         <p className="mt-1 text-sm text-slate-500">Read-only source inputs for workflow runs.</p>
       </div>
-
-      <PageHelp
-        title="Use this page to connect source material safely."
-        description="Integrations fetch or reference Markdown, GitHub, Jira, Confluence, and OpenAPI material without turning PromptHub into the system of record."
-        steps={[
-          "Review available capabilities so you know which sources can be fetched.",
-          "Save a named connection when a provider requires a token or shared secret.",
-          "Fetch source content by URL, key, reference, file upload, or pasted text.",
-          "Use OpenAPI diff when a workflow needs to explain API changes between two specs.",
-        ]}
-        note="Source references should stay reference-only unless a retention policy explicitly allows stored content."
-      />
 
       {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
       {message && <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{message}</p>}

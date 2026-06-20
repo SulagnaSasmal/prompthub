@@ -24,6 +24,73 @@ from app.models.workflow_v2 import Example, Variable
 
 Base.metadata.create_all(bind=engine)
 
+DEMO_PROMPTS = [
+    {
+        "name": "Demo: Release Notes from Jira Tickets",
+        "description": "Turns a list of Jira issues into customer-facing release notes for a SaaS documentation team.",
+        "category": "Documentation",
+        "subcategory": "Release Notes",
+        "target_model": "GPT-5",
+        "risk_level": "Low",
+        "tags": ["demo", "technical-writing", "jira", "release-notes"],
+        "usage_notes": "Start here during demos: paste three to five Jira summaries and generate a polished release-note draft.",
+        "versions": [
+            {
+                "number": "1.0",
+                "text": (
+                    "Create customer-facing release notes from the Jira source material. "
+                    "Group updates by Added, Changed, Fixed, and Known Issues. "
+                    "Use plain language, avoid internal ticket jargon, and include one upgrade-impact note when relevant."
+                ),
+                "summary": "Demo workflow for release note generation",
+            },
+        ],
+    },
+    {
+        "name": "Demo: API Change Explainer",
+        "description": "Explains API changes from an OpenAPI diff for developer documentation and migration guides.",
+        "category": "Documentation",
+        "subcategory": "API Summaries",
+        "target_model": "GPT-5",
+        "risk_level": "Medium",
+        "tags": ["demo", "openapi", "developer-docs", "migration"],
+        "usage_notes": "Use this to show how source references and OpenAPI diffs become reviewable developer-facing guidance.",
+        "versions": [
+            {
+                "number": "1.0",
+                "text": (
+                    "Explain the API changes in the source material for developers. "
+                    "Return: Summary, Added Endpoints, Removed Endpoints, Behavior Changes, Migration Steps, and Documentation Gaps. "
+                    "Do not invent endpoints that are not present in the source."
+                ),
+                "summary": "Demo workflow for API change documentation",
+            },
+        ],
+    },
+    {
+        "name": "Demo: Support Thread to KB Article",
+        "description": "Converts a resolved support conversation into a reusable customer knowledge base article.",
+        "category": "Support",
+        "subcategory": "KB Article",
+        "target_model": "GPT-5",
+        "risk_level": "Medium",
+        "tags": ["demo", "support", "kb", "customer-success"],
+        "usage_notes": "Use this to demonstrate support, review, privacy, and field-quality workflows in one path.",
+        "versions": [
+            {
+                "number": "1.0",
+                "text": (
+                    "Convert the resolved support thread into a knowledge base article. "
+                    "Include Title, Symptoms, Environment, Cause, Resolution, Verification, and Related Links. "
+                    "Remove private customer identifiers and flag any missing technical detail as [NEEDS REVIEW]."
+                ),
+                "summary": "Demo workflow for support-to-KB conversion",
+            },
+        ],
+    },
+]
+
+
 PROMPTS_DATA = [
     # ── DOCUMENTATION ──────────────────────────────────────────────────────────
     {
@@ -776,7 +843,7 @@ def seed():
         reviewer = users["reviewer1"]
         approver = users["approver1"]
 
-        for pd in PROMPTS_DATA + COMMUNITY_PROMPTS:
+        for pd in DEMO_PROMPTS + PROMPTS_DATA + COMMUNITY_PROMPTS:
             existing = db.query(Prompt).filter(Prompt.name == pd["name"]).first()
             if existing:
                 print(f"  Skip (exists): {pd['name']}")

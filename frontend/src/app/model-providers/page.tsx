@@ -67,21 +67,22 @@ export default function ModelProvidersPage() {
   return (
     <div className="max-w-6xl space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-slate-900">Model Providers</h2>
+        <div className="flex items-center gap-2">
+          <h2 className="text-2xl font-bold text-slate-900">Model Providers</h2>
+          <PageHelp
+            title="Use this page to configure model gateway providers."
+            description="Model provider records tell governed workflow runs which backend model, endpoint, and credential set should execute prompts."
+            steps={[
+              "Choose the provider type and model name that match your approved execution environment.",
+              "Add an endpoint override only when Azure or an internal HTTP gateway requires it.",
+              "Save credentials through this form instead of embedding them in workflow prompts.",
+              "Confirm the configured provider appears in the provider list with the expected status.",
+            ]}
+            note="The local governed draft gateway continues to run when no external provider is configured."
+          />
+        </div>
         <p className="mt-1 text-sm text-slate-500">Server-side provider configuration for governed workflow execution.</p>
       </div>
-
-      <PageHelp
-        title="Use this page to configure model gateway providers."
-        description="Model provider records tell governed workflow runs which backend model, endpoint, and credential set should execute prompts."
-        steps={[
-          "Choose the provider type and model name that match your approved execution environment.",
-          "Add an endpoint override only when Azure or an internal HTTP gateway requires it.",
-          "Save credentials through this form instead of embedding them in workflow prompts.",
-          "Confirm the configured provider appears in the provider list with the expected status.",
-        ]}
-        note="The local governed draft gateway continues to run when no external provider is configured."
-      />
 
       {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
       {message && <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{message}</p>}

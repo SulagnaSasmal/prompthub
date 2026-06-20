@@ -48,21 +48,20 @@ export default function RunsPage() {
   return (
     <div>
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-slate-900">Run History</h2>
+        <div className="flex items-center gap-2">
+          <h2 className="text-2xl font-bold text-slate-900">Run History</h2>
+          <PageHelp
+            title="Use this page to inspect previous workflow runs."
+            description="Run History shows generated outputs, blocked attempts, comparison tools, and publishing/export events."
+            steps={[
+              "Review each run result, model, latency, timestamp, and output preview.",
+              "Select two runs and compare them when you need to choose the stronger output.",
+              "Enter a GitHub PR URL when you want a publish event tied to a target review thread.",
+              "Open the source workflow from the library when a run reveals a prompt, style, or test gap.",
+            ]}
+          />
+        </div>
         <p className="mt-0.5 text-sm text-slate-500">Your generated outputs and blocked attempts.</p>
-      </div>
-
-      <div className="mb-6">
-        <PageHelp
-          title="Use this page to inspect previous workflow runs."
-          description="Run History shows generated outputs, blocked attempts, comparison tools, and publishing/export events."
-          steps={[
-            "Review each run result, model, latency, timestamp, and output preview.",
-            "Select two runs and compare them when you need to choose the stronger output.",
-            "Enter a GitHub PR URL when you want a publish event tied to a target review thread.",
-            "Open the source workflow from the library when a run reveals a prompt, style, or test gap.",
-          ]}
-        />
       </div>
 
       {error && <p className="mb-4 text-sm text-red-600">{error}</p>}

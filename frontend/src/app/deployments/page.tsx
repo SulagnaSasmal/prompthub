@@ -60,24 +60,25 @@ export default function DeploymentsPage() {
     <div className="max-w-7xl space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Deployments</h2>
+          <div className="flex items-center gap-2">
+            <h2 className="text-2xl font-bold text-slate-900">Deployments</h2>
+            <PageHelp
+              title="Use this page to monitor production workflow delivery."
+              description="Deployments shows production workflow versions and the webhook delivery status that keeps downstream systems in sync."
+              steps={[
+                "Review each production workflow for current version, risk, run count, and webhook status.",
+                "Open workflows that show unexpected risk or usage before changing their production status.",
+                "Check delivery history when an endpoint did not receive a deployment event.",
+                "Replay due or failed deliveries after confirming the webhook endpoint is healthy.",
+              ]}
+            />
+          </div>
           <p className="mt-1 text-sm text-slate-500">Production workflow versions and webhook delivery status.</p>
         </div>
         <Link href="/admin" className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700">
           Configure webhooks
         </Link>
       </div>
-
-      <PageHelp
-        title="Use this page to monitor production workflow delivery."
-        description="Deployments shows production workflow versions and the webhook delivery status that keeps downstream systems in sync."
-        steps={[
-          "Review each production workflow for current version, risk, run count, and webhook status.",
-          "Open workflows that show unexpected risk or usage before changing their production status.",
-          "Check delivery history when an endpoint did not receive a deployment event.",
-          "Replay due or failed deliveries after confirming the webhook endpoint is healthy.",
-        ]}
-      />
 
       {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
       {message && <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{message}</p>}

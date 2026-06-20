@@ -210,6 +210,17 @@ export default function PromptDetailPage() {
           <div>
             <div className="mb-2 flex flex-wrap items-center gap-2">
               <h2 className="text-xl font-bold text-slate-900">{prompt.name}</h2>
+              <PageHelp
+                title="Use this page to run, review, and improve one workflow."
+                description="A workflow detail page brings together inputs, output, examples, tests, comments, version history, and governance evidence."
+                steps={[
+                  "Choose the version you want to inspect or run from the version selector.",
+                  "Use the tabs to move between runtime inputs, governance checks, tests, evaluations, comments, and history.",
+                  "Fill required inputs or fetch a source reference, then run the workflow through the server-side gateway.",
+                  "Copy or export good output, rate the run, and promote strong results into examples or tests when appropriate.",
+                ]}
+                note="High-risk or production workflows should be reviewed through tests and governance checks before status promotion."
+              />
               <StatusBadge status={prompt.status} />
               <RiskBadge risk={prompt.risk_level} />
             </div>
@@ -226,20 +237,6 @@ export default function PromptDetailPage() {
             <Metric label="Field" value={fieldQuality ? `${fieldQuality.useful_rate}%` : "0%"} />
           </div>
         </div>
-      </div>
-
-      <div className="mb-4">
-        <PageHelp
-          title="Use this page to run, review, and improve one workflow."
-          description="A workflow detail page brings together inputs, output, examples, tests, comments, version history, and governance evidence."
-          steps={[
-            "Choose the version you want to inspect or run from the version selector.",
-            "Use the tabs to move between runtime inputs, governance checks, tests, evaluations, comments, and history.",
-            "Fill required inputs or fetch a source reference, then run the workflow through the server-side gateway.",
-            "Copy or export good output, rate the run, and promote strong results into examples or tests when appropriate.",
-          ]}
-          note="High-risk or production workflows should be reviewed through tests and governance checks before status promotion."
-        />
       </div>
 
       <div className="mb-4 flex flex-wrap items-center gap-3">

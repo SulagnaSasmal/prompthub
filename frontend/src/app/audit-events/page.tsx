@@ -32,20 +32,21 @@ export default function AuditEventsPage() {
   return (
     <div className="max-w-7xl space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-slate-900">Audit Events</h2>
+        <div className="flex items-center gap-2">
+          <h2 className="text-2xl font-bold text-slate-900">Audit Events</h2>
+          <PageHelp
+            title="Use this page to trace important workspace activity."
+            description="Audit Events records who changed, ran, exported, published, or configured governed workflow assets."
+            steps={[
+              "Start with the summary metrics to understand audit volume and the latest recorded activity.",
+              "Scan the event table for target type, actor, payload, and timestamp.",
+              "Use export and publish events to confirm where generated content was sent.",
+              "Investigate unexpected security, provider, or integration changes with the responsible owner.",
+            ]}
+          />
+        </div>
         <p className="mt-1 text-sm text-slate-500">Expanded v3 audit trail for runs, exports, providers, integrations, packs, and security settings.</p>
       </div>
-
-      <PageHelp
-        title="Use this page to trace important workspace activity."
-        description="Audit Events records who changed, ran, exported, published, or configured governed workflow assets."
-        steps={[
-          "Start with the summary metrics to understand audit volume and the latest recorded activity.",
-          "Scan the event table for target type, actor, payload, and timestamp.",
-          "Use export and publish events to confirm where generated content was sent.",
-          "Investigate unexpected security, provider, or integration changes with the responsible owner.",
-        ]}
-      />
 
       {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
 

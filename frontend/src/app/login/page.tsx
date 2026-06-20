@@ -66,16 +66,50 @@ export default function LoginPage() {
     }
   }
 
+  function useDemoAccount() {
+    setMode("login");
+    setUsername("admin");
+    setPassword("Prompthub2026!");
+    setError("");
+    setMessage("Demo admin credentials filled. Sign in to explore the seeded workspace.");
+  }
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
       <div className="w-full max-w-sm rounded-lg border border-slate-200 bg-white p-8 shadow-sm">
-        <h1 className="mb-1 text-xl font-bold text-slate-900">
-          {mode === "login" && "Sign in to PromptHub"}
-          {mode === "register" && "Create your PromptHub account"}
-          {mode === "forgot" && "Reset your password"}
-          {mode === "reset" && "Choose a new password"}
-        </h1>
+        <div className="mb-1 flex items-center gap-2">
+          <h1 className="text-xl font-bold text-slate-900">
+            {mode === "login" && "Sign in to PromptHub"}
+            {mode === "register" && "Create your PromptHub account"}
+            {mode === "forgot" && "Reset your password"}
+            {mode === "reset" && "Choose a new password"}
+          </h1>
+          <PageHelp
+            title="Use this page to access PromptHub."
+            description="Sign in to your workspace, create an author account for demos, or reset a password with the reset flow."
+            steps={[
+              "Use the demo admin account to explore the seeded workspace quickly.",
+              "Create an author account when you want a separate test user.",
+              "Choose Forgot password when you need a reset token and then set a new password.",
+              "After sign-in, open Working Library to find or create workflows.",
+            ]}
+          />
+        </div>
         <p className="text-sm text-slate-500 mb-6">Governed Writing Workspace</p>
+        {mode === "login" && (
+          <div className="mb-5 rounded-lg border border-brand-100 bg-brand-50 p-3 text-sm text-slate-700">
+            <p className="font-semibold text-slate-900">Demo access</p>
+            <p className="mt-1">Username: <span className="font-mono">admin</span></p>
+            <p>Password: <span className="font-mono">Prompthub2026!</span></p>
+            <button
+              type="button"
+              onClick={useDemoAccount}
+              className="mt-3 rounded-md bg-brand-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-brand-700"
+            >
+              Fill demo account
+            </button>
+          </div>
+        )}
         <form onSubmit={handleSubmit} className="space-y-4">
           {(mode === "login" || mode === "register") && (
             <div>
@@ -185,18 +219,6 @@ export default function LoginPage() {
         >
           {mode === "login" ? "Create an author account" : "Use an existing account"}
         </button>
-        <div className="mt-6">
-          <PageHelp
-            title="Use this page to access PromptHub."
-            description="Sign in to your workspace, create an author account for demos, or reset a password with the reset flow."
-            steps={[
-              "Use Sign in when you already have a username and password.",
-              "Choose Create an author account when you need a new demo or contributor account.",
-              "Choose Forgot password when you need a reset token and then set a new password.",
-              "After sign-in, open Working Library to find or create workflows.",
-            ]}
-          />
-        </div>
       </div>
     </div>
   );
