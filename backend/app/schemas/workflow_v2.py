@@ -154,6 +154,23 @@ class IntegrationFetchOut(BaseModel):
     content: str
 
 
+class OpenApiDiffRequest(BaseModel):
+    base_locator: str | None = None
+    base_content: str | None = None
+    head_locator: str | None = None
+    head_content: str | None = None
+
+
+class OpenApiDiffOut(BaseModel):
+    base_reference: str
+    head_reference: str
+    added: list[str]
+    removed: list[str]
+    unchanged_count: int
+    summary: str
+    diff_markdown: str
+
+
 class IntegrationCapabilityOut(BaseModel):
     source: str
     status: str

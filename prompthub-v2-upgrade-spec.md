@@ -413,8 +413,8 @@ The upgrade is complete when all of the following are demonstrable:
 | Test cases from runs | Done | Reviewer/approver can promote a run into a test case. |
 | Markdown/file source input | Done | Markdown and pasted source are accepted in source fetch and runner input. |
 | GitHub source input | Done | Public GitHub URLs can be fetched read-only for issues, PRs, commits, blobs, and repository summaries. |
-| Jira source input | Partial | UI/API accept Jira locators and pasted content; live Jira authentication/fetch is pending. |
-| OpenAPI source input | Partial | Pasted spec content is accepted; URL fetch and diff parser are pending. |
+| Jira source input | Done | UI/API accept Jira locators and use live Jira Cloud fetch when credentials are configured. |
+| OpenAPI source input | Done | Pasted specs, public URL fetch, and endpoint/method diff parsing are implemented. |
 | Style Guide and Terminology Integration | Done | Style profiles, rules, attachment, runtime injection, and style checks exist. |
 | Collaboration comments | Done | Comments can be added to workflow versions. |
 
@@ -458,7 +458,7 @@ The upgrade is complete when all of the following are demonstrable:
 | 5. Examples library surface | Done |
 | 6. Working Library IA and writer-native UX pass | Done |
 | 7. Style Profiles and Style Check | Done |
-| 8. Source integrations | Partial |
+| 8. Source integrations | Done |
 | 9. Comments | Done |
 | 10. Documentation update and demo video | Partial |
 
@@ -475,7 +475,7 @@ The upgrade is complete when all of the following are demonstrable:
 | 7 | Highly rated run can be promoted to example and test | Done |
 | 8 | Workflow cannot be Approved without example | Done |
 | 9 | Style Profile flags banned phrase and can be injected at runtime | Done |
-| 10 | Release-notes workflow pulls Jira ticket as input | Partial |
+| 10 | Release-notes workflow pulls Jira ticket as input | Done |
 | 11 | v1 governance capabilities still pass | Done |
 | 12 | Fresh writer completes find-run-adapt-improve using only User Guide | Done |
 

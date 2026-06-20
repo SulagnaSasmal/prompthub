@@ -197,6 +197,11 @@ export const api = {
         method: "POST",
         body: JSON.stringify(data),
       }),
+    diffOpenApi: (data: object) =>
+      request<import("./types").OpenApiDiff>("/integrations/openapi/diff", {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
     integrations: () => request<import("./types").IntegrationCapability[]>("/integrations"),
     createIntegration: (data: object) =>
       request<import("./types").IntegrationConnection>("/integrations", {

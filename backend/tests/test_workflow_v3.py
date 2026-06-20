@@ -49,6 +49,19 @@ def test_v3_integrations_review_queue_and_markdown_export(client):
     assert fetched.status_code == 200
     assert "New dashboard export" in fetched.json()["content"]
 
+    jira = client.post("/api/v1/integrations/jira/fetch", headers=_headers(token), json={
+        "locator": "DOC-123",
+    })
+    assert jira.status_code == 200
+    assert "DOC-123" in jira.json()["content"]
+
+    openapi_diff = client.post("/api/v1/integrations/openapi/diff", headers=_headers(token), json={
+        "base_content": '{"openapi":"3.0.0","paths":{"/users":{"get":{}}}}',
+        "head_content": '{"openapi":"3.0.0","paths":{"/users":{"get":{}},"/teams":{"post":{}}}}',
+    })
+    assert openapi_diff.status_code == 200
+    assert openapi_diff.json()["added"] == ["POST /teams"]
+
     variable_resp = client.post(f"/api/v1/versions/{version_id}/variables", headers=_headers(token), json=[{
         "name": "source_text",
         "label": "Source text",

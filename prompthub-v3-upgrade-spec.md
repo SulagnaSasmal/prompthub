@@ -944,8 +944,8 @@ This slice gives the biggest user-visible improvement without trying to build ev
 | Runner as main product surface | Done | Split source/input/result workflow exists on detail page. |
 | Output comparison | Done | Version diff and run-to-run output comparison are implemented. |
 | GitHub integration | Done | Public read-only fetch for issues, PRs, commits, blobs/raw files, and repo summaries. |
-| Jira integration | Partial | Pasted or simulated Jira source works; authenticated Jira fetch is pending. |
-| OpenAPI integration | Partial | Pasted OpenAPI source works; URL pull, parsing, and diff are pending. |
+| Jira integration | Done | Jira Cloud issue fetch works when credentials are configured, with simulated fallback otherwise. |
+| OpenAPI integration | Done | Pasted specs, public URL pulls, and endpoint/method diff parsing are implemented. |
 | Markdown/file integration | Partial | Pasted Markdown works; file upload parser is pending. |
 | Style profiles and terminology | Done | Rule creation, attachment, injection, and style check exist. |
 | Pull Request style check | Done |
@@ -994,7 +994,7 @@ This slice gives the biggest user-visible improvement without trying to build ev
 | Phase | Status |
 |-------|--------|
 | Phase 1: Product cleanup and naming | Partial |
-| Phase 2: Real integrations | Partial |
+| Phase 2: Real integrations | Done |
 | Phase 3: Runner 2.0 | Partial |
 | Phase 4: Style Profiles 2.0 | Partial |
 | Phase 5: Review Queue and Deployment Center | Done |
@@ -1009,8 +1009,8 @@ This slice gives the biggest user-visible improvement without trying to build ev
 |---|-----------|--------|
 | 1 | UI consistently uses Workflow language | Partial |
 | 2 | Writer can run workflow from real GitHub source content | Done |
-| 3 | Writer can run workflow from real Jira source content | Partial |
-| 4 | Writer can run workflow from OpenAPI diff content | Partial |
+| 3 | Writer can run workflow from real Jira source content | Done |
+| 4 | Writer can run workflow from OpenAPI diff content | Done |
 | 5 | Writer can compare two generated outputs | Done |
 | 6 | Writer can export output to Markdown | Done |
 | 7 | Style Profile flags terminology and suggests replacements | Done |

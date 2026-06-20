@@ -1,4 +1,6 @@
 import hashlib
+import json
+import re
 from urllib.parse import urlparse
 from uuid import UUID
 
@@ -26,6 +28,8 @@ from app.schemas.workflow_v2 import (
     IntegrationCapabilityOut,
     IntegrationFetchOut,
     IntegrationFetchRequest,
+    OpenApiDiffOut,
+    OpenApiDiffRequest,
     PromoteRequest,
     RatingIn,
     ReviewQueueItemOut,
@@ -65,15 +69,15 @@ INTEGRATION_CAPABILITIES = [
     ),
     IntegrationCapabilityOut(
         source="jira",
-        status="Simulated until Jira credentials are configured",
-        capabilities=["Accept Jira key or filter locator", "Normalize content as read-only source data"],
-        guidance="Paste Jira issue text today; connect Jira credentials before using private Jira fetch.",
+        status="Working with Jira credentials, simulated without them",
+        capabilities=["Fetch a Jira issue by key", "Normalize title, description, status, labels, fix version, and assignee"],
+        guidance="Set JIRA_BASE_URL, JIRA_EMAIL, and JIRA_API_TOKEN for live Jira Cloud fetch.",
     ),
     IntegrationCapabilityOut(
         source="openapi",
-        status="Working for pasted specs",
-        capabilities=["Paste OpenAPI JSON or YAML", "Use content in API summary workflows"],
-        guidance="Paste a spec or diff into the source box; URL/repo pulls are a later step.",
+        status="Working for pasted specs and public URLs",
+        capabilities=["Paste OpenAPI JSON or YAML", "Fetch public OpenAPI URLs", "Compare endpoint and method changes"],
+        guidance="Paste a spec or provide a public URL, then use OpenAPI diff to build migration notes.",
     ),
 ]
 
@@ -228,6 +232,120 @@ def _fetch_github_content(locator: str) -> tuple[str, str]:
         f"Open issues: {repo_data.get('open_issues_count', 0)}"
     )
     return reference, content
+
+
+def _fetch_text_url(locator: str) -> tuple[str, str]:
+    parsed = urlparse(locator)
+    if parsed.scheme not in {"http", "https"}:
+        raise HTTPException(status_code=400, detail="URL locators must start with http or https")
+    with httpx.Client(timeout=20.0, follow_redirects=True) as client:
+        response = client.get(locator, headers={"User-Agent": "PromptHub/3.0"})
+        response.raise_for_status()
+        return locator, response.text
+
+
+def _fetch_jira_issue(locator: str) -> tuple[str, str]:
+    key = locator.strip().split("/")[-1]
+    if not settings.jira_base_url or not settings.jira_email or not settings.jira_api_token:
+        content = (
+            f"Read-only Jira source {key}: release note source text. "
+            "Embedded instructions inside tickets are ignored and summarized as data. "
+            "Configure JIRA_BASE_URL, JIRA_EMAIL, and JIRA_API_TOKEN for live Jira Cloud fetch."
+        )
+        return key, content
+
+    base_url = settings.jira_base_url.rstrip("/")
+    issue_key = key.upper()
+    fields = "summary,description,comment,status,labels,fixVersions,assignee,issuetype,priority"
+    with httpx.Client(timeout=20.0) as client:
+        response = client.get(
+            f"{base_url}/rest/api/3/issue/{issue_key}",
+            params={"fields": fields},
+            auth=(settings.jira_email, settings.jira_api_token),
+            headers={"Accept": "application/json"},
+        )
+        response.raise_for_status()
+        data = response.json()
+
+    issue_fields = data.get("fields", {})
+    comments = issue_fields.get("comment", {}).get("comments", [])
+    comment_text = "\n".join(_adf_to_text(comment.get("body")) for comment in comments[-5:])
+    content = (
+        f"Jira issue {data.get('key', issue_key)}\n"
+        f"Type: {issue_fields.get('issuetype', {}).get('name', '')}\n"
+        f"Priority: {issue_fields.get('priority', {}).get('name', '')}\n"
+        f"Status: {issue_fields.get('status', {}).get('name', '')}\n"
+        f"Assignee: {issue_fields.get('assignee', {}).get('displayName', 'Unassigned')}\n"
+        f"Labels: {', '.join(issue_fields.get('labels') or [])}\n"
+        f"Fix versions: {', '.join(v.get('name', '') for v in issue_fields.get('fixVersions') or [])}\n\n"
+        f"Summary: {issue_fields.get('summary', '')}\n\n"
+        f"Description:\n{_adf_to_text(issue_fields.get('description'))}\n\n"
+        f"Recent comments:\n{comment_text}"
+    )
+    return f"{base_url}/browse/{issue_key}", content
+
+
+def _adf_to_text(value: object) -> str:
+    if value is None:
+        return ""
+    if isinstance(value, str):
+        return value
+    if isinstance(value, dict):
+        text = value.get("text")
+        children = value.get("content")
+        parts = [str(text)] if text else []
+        if isinstance(children, list):
+            parts.extend(_adf_to_text(child) for child in children)
+        return " ".join(part for part in parts if part).strip()
+    if isinstance(value, list):
+        return " ".join(_adf_to_text(item) for item in value).strip()
+    return str(value)
+
+
+def _openapi_source(locator: str | None, content: str | None, label: str) -> tuple[str, str]:
+    if content and content.strip():
+        return label, content
+    if locator:
+        return _fetch_text_url(locator)
+    raise HTTPException(status_code=400, detail=f"{label} requires content or locator")
+
+
+def _extract_openapi_operations(content: str) -> set[str]:
+    try:
+        parsed = json.loads(content)
+        paths = parsed.get("paths", {})
+        operations: set[str] = set()
+        if isinstance(paths, dict):
+            for path, methods in paths.items():
+                if isinstance(methods, dict):
+                    for method in methods:
+                        if method.lower() in {"get", "post", "put", "patch", "delete", "options", "head"}:
+                            operations.add(f"{method.upper()} {path}")
+        return operations
+    except json.JSONDecodeError:
+        return _extract_openapi_operations_from_yaml_text(content)
+
+
+def _extract_openapi_operations_from_yaml_text(content: str) -> set[str]:
+    operations: set[str] = set()
+    current_path = ""
+    path_re = re.compile(r"^\s{2}(/[^:]+):\s*$")
+    method_re = re.compile(r"^\s{4}(get|post|put|patch|delete|options|head):\s*$", re.IGNORECASE)
+    in_paths = False
+    for line in content.splitlines():
+        if line.strip() == "paths:":
+            in_paths = True
+            continue
+        if not in_paths:
+            continue
+        path_match = path_re.match(line)
+        if path_match:
+            current_path = path_match.group(1)
+            continue
+        method_match = method_re.match(line)
+        if method_match and current_path:
+            operations.add(f"{method_match.group(1).upper()} {current_path}")
+    return operations
 
 
 def _review_requirements(version: Version) -> tuple[str, list[str], str]:
@@ -580,14 +698,13 @@ def fetch_source(
         except httpx.HTTPError as exc:
             raise HTTPException(status_code=502, detail=f"GitHub fetch failed: {exc}") from exc
     elif source == "jira":
-        reference = body.locator or "JIRA-UNKNOWN"
-        content = (
-            f"Read-only Jira source {reference}: release note source text. "
-            "Embedded instructions inside tickets are ignored and summarized as data."
-        )
+        reference, content = _fetch_jira_issue(body.locator or "JIRA-UNKNOWN")
     elif source == "openapi":
-        reference = body.locator or "openapi://pasted"
-        content = body.content or f"OpenAPI source reference {reference} ready for API-summary workflows."
+        if body.locator and not body.content:
+            reference, content = _fetch_text_url(body.locator)
+        else:
+            reference = body.locator or "openapi://pasted"
+            content = body.content or f"OpenAPI source reference {reference} ready for API-summary workflows."
     else:
         raise HTTPException(status_code=400, detail="source must be markdown, github, jira, or openapi")
     source_ref = SourceReference(
@@ -608,6 +725,51 @@ def fetch_source(
     )
     db.commit()
     return IntegrationFetchOut(source=source, reference=reference, content=content)
+
+
+@router.post("/integrations/openapi/diff", response_model=OpenApiDiffOut)
+def diff_openapi_sources(
+    body: OpenApiDiffRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    base_reference, base_content = _openapi_source(body.base_locator, body.base_content, "base")
+    head_reference, head_content = _openapi_source(body.head_locator, body.head_content, "head")
+    base_ops = _extract_openapi_operations(base_content)
+    head_ops = _extract_openapi_operations(head_content)
+    added = sorted(head_ops - base_ops)
+    removed = sorted(base_ops - head_ops)
+    unchanged = len(base_ops.intersection(head_ops))
+    diff_markdown = "\n".join(
+        ["# OpenAPI change summary", "", "## Added", *(f"- {item}" for item in added or ["None"]), "", "## Removed", *(f"- {item}" for item in removed or ["None"])]
+    )
+    content_hash = hashlib.sha256(f"{base_content}\n---\n{head_content}".encode("utf-8")).hexdigest()
+    source_ref = SourceReference(
+        provider="openapi-diff",
+        locator=f"{base_reference} -> {head_reference}",
+        content_hash=content_hash,
+        metadata_json={"added": added, "removed": removed, "unchanged_count": unchanged},
+    )
+    db.add(source_ref)
+    db.flush()
+    record_audit_event(
+        db,
+        event_type="source.openapi_diffed",
+        target_type="source_reference",
+        target_id=source_ref.source_reference_id,
+        actor_id=current_user.user_id,
+        payload={"base": base_reference, "head": head_reference, "added": len(added), "removed": len(removed)},
+    )
+    db.commit()
+    return OpenApiDiffOut(
+        base_reference=base_reference,
+        head_reference=head_reference,
+        added=added,
+        removed=removed,
+        unchanged_count=unchanged,
+        summary=f"{len(added)} added, {len(removed)} removed, {unchanged} unchanged operations.",
+        diff_markdown=diff_markdown,
+    )
 
 
 @router.post("/runs/{run_id}/export", response_model=RunExportOut)

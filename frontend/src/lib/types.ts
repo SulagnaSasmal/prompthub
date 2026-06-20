@@ -161,6 +161,16 @@ export interface SourceReference {
   created_at: string;
 }
 
+export interface OpenApiDiff {
+  base_reference: string;
+  head_reference: string;
+  added: string[];
+  removed: string[];
+  unchanged_count: number;
+  summary: string;
+  diff_markdown: string;
+}
+
 export interface RunExport {
   run_id: string;
   filename: string;
