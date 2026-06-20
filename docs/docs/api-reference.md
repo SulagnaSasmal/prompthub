@@ -172,6 +172,20 @@ The run endpoint enforces role/status access, required variables, governance che
 
 ---
 
+## Deployment Webhooks
+
+| Method | Path | Description | Min role |
+|--------|------|-------------|----------|
+| GET/POST | /webhooks | List or create deployment webhook endpoints | Approver |
+| PATCH | /webhooks/{id} | Update endpoint metadata, URL, secret, or active state | Approver |
+| GET | /webhooks/deliveries | Inspect recent webhook delivery attempts | Approver |
+| POST | /webhooks/deliveries/{id}/retry | Retry one failed or pending delivery | Approver |
+| POST | /webhooks/retry-pending | Retry all due pending deliveries | Approver |
+
+When a version transitions from Approved to Production, PromptHub emits `prompt.production_deployed` to each active endpoint. Payloads include prompt metadata, the production version, rendered template text, previous production version metadata, and a unified diff. Requests include `X-PromptHub-Signature-256: sha256=<hmac>` using the endpoint secret.
+
+---
+
 ## Audit
 
 | Method | Path | Description | Min role |

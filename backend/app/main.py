@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.core.database import Base, engine
 from app import models as _models
-from app.routers import auth, audit, dashboard, evaluations, governance, prompts, tests, versions, workflow_v2
+from app.routers import auth, audit, dashboard, evaluations, governance, prompts, tests, versions, webhooks, workflow_v2
 
 _ = _models
 
@@ -62,7 +62,7 @@ app.add_middleware(
 )
 
 for router in [auth.router, prompts.router, versions.router, evaluations.router,
-               tests.router, governance.router, dashboard.router, audit.router, workflow_v2.router]:
+               tests.router, governance.router, dashboard.router, audit.router, workflow_v2.router, webhooks.router]:
     app.include_router(router)
 
 

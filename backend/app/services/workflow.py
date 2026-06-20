@@ -121,6 +121,7 @@ def transition(
     db: Session,
 ) -> Version:
     from_status = version.status
+    previous_production_version = None
 
     if to_status not in TRANSITIONS.get(from_status, []):
         raise HTTPException(
@@ -176,6 +177,7 @@ def transition(
             .first()
         )
         if prev_prod:
+            previous_production_version = prev_prod
             _log(prev_prod, "Production", "Retired", actor_id, "Auto-retired on promotion of successor", db)
             prev_prod.status = "Retired"
         prompt.current_version = version.version_number
@@ -192,6 +194,10 @@ def transition(
 
     db.commit()
     db.refresh(version)
+    if to_status == "Production":
+        from app.services.webhook_delivery import enqueue_deployment_webhooks
+
+        enqueue_deployment_webhooks(db, version, actor_id, previous_production_version)
     return version
 
 

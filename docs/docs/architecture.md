@@ -94,6 +94,12 @@ The Prompt Runner never calls a model API from the browser. `/api/v1/versions/{i
 
 Source integrations are read-only. Fetched Jira, GitHub, Markdown, or OpenAPI content is treated as input data and never as instructions to the application.
 
+### Deployment webhooks
+
+Approvers can configure deployment webhook endpoints in Admin. When a version transitions from Approved to Production, the workflow engine enqueues `prompt.production_deployed` deliveries. Each delivery POST includes prompt metadata, the production version, the rendered template, previous production version metadata, and a unified diff.
+
+Outbound requests are signed with `X-PromptHub-Signature-256` using HMAC-SHA256 and the endpoint secret. Failed deliveries are persisted with retry metadata and can be retried manually or through the due-pending retry endpoint.
+
 ### Role enforcement
 
 - `require_role("author", "reviewer", "approver")` — any of these roles
