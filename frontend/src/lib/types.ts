@@ -29,10 +29,109 @@ export interface Prompt {
   target_model: string;
   risk_level: RiskLevel;
   tags: string[];
+  task_type: string;
+  usage_notes: string;
+  style_profile_id?: string;
+  run_count: number;
+  formal_quality_score?: number;
   created_by: string;
   created_at: string;
   updated_at: string;
   view_count: string;
+}
+
+export interface Variable {
+  variable_id: string;
+  version_id: string;
+  name: string;
+  label: string;
+  help_text: string;
+  var_type: "text" | "long-text" | "select" | "source-reference";
+  required: boolean;
+  default_value?: string;
+  example_value?: string;
+  options: string[];
+}
+
+export interface Run {
+  run_id: string;
+  version_id: string;
+  run_by: string;
+  input_payload: Record<string, unknown>;
+  output_text?: string;
+  model: string;
+  latency_ms: number;
+  style_profile_applied?: string;
+  governance_result: "Pass" | "Blocked";
+  blocked_reason?: string;
+  created_at: string;
+}
+
+export interface RunRating {
+  rating_id: string;
+  run_id: string;
+  rated_by: string;
+  tags: string[];
+  comment?: string;
+  created_at: string;
+}
+
+export interface Example {
+  example_id: string;
+  version_id: string;
+  input_payload: Record<string, unknown>;
+  output_text: string;
+  note: string;
+  source_run_id?: string;
+  is_stale: boolean;
+}
+
+export interface FieldQuality {
+  version_id: string;
+  total_ratings: number;
+  positive_count: number;
+  negative_count: number;
+  useful_rate: number;
+  risk_tags: Record<string, number>;
+}
+
+export interface StyleRule {
+  rule_id: string;
+  style_profile_id: string;
+  rule_type: string;
+  pattern: string;
+  message: string;
+  severity: "error" | "warning";
+}
+
+export interface StyleProfile {
+  style_profile_id: string;
+  name: string;
+  owner_id: string;
+  status: Status;
+  version_number: string;
+  created_at: string;
+  rules: StyleRule[];
+}
+
+export interface StyleFlag {
+  rule_id: string;
+  rule_type: string;
+  pattern: string;
+  message: string;
+  severity: "error" | "warning";
+  start: number;
+  end: number;
+  matched_text: string;
+}
+
+export interface Comment {
+  comment_id: string;
+  target_type: "workflow" | "version" | "run";
+  target_id: string;
+  author_id: string;
+  body: string;
+  created_at: string;
 }
 
 export interface Version {

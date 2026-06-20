@@ -18,10 +18,10 @@ export function VersionDiff({ versionId, otherId }: { versionId: string; otherId
     api.versions.diff(versionId, otherId).then((d) => setDiff(d as unknown as DiffOut));
   }, [versionId, otherId]);
 
-  if (!diff) return <div className="animate-pulse h-48 bg-white rounded-xl border border-slate-200" />;
+  if (!diff) return <div className="animate-pulse h-48 bg-white rounded-lg border border-slate-200" />;
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-6">
+    <div className="bg-white rounded-lg border border-slate-200 p-6">
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-semibold text-slate-800">
           Diff: v{diff.version_a} vs v{diff.version_b}

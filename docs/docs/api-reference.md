@@ -142,6 +142,36 @@ All scores must be 1–10. The overall score is computed server-side using the w
 
 ---
 
+## Workflow Runner and v2 Workspace
+
+| Method | Path | Description | Min role |
+|--------|------|-------------|----------|
+| GET/POST | /versions/{id}/variables | Read or define template variables | Author |
+| GET/POST | /versions/{id}/examples | Read or create good input/output examples | Author |
+| POST | /versions/{id}/run | Execute through the server-side model gateway and persist the run | Consumer for Approved/Production |
+| GET | /runs | Run history; Consumers see own runs, Reviewers can see all | Consumer |
+| POST | /runs/{id}/rating | Submit structured output feedback | Consumer |
+| GET | /versions/{id}/field-quality | Aggregate real-usage quality signal | Consumer |
+| POST | /runs/{id}/promote-example | Promote a run to an example | Author |
+| POST | /runs/{id}/promote-test | Promote a run to a test case | Reviewer |
+| POST | /integrations/{source}/fetch | Pull read-only source content into a run input | Consumer |
+| GET/POST | /comments | Read or post workflow/version/run comments | Consumer |
+
+The run endpoint enforces role/status access, required variables, governance checks, approved model routing, persistence, and blocked-attempt logging. The browser never receives model credentials.
+
+---
+
+## Style Profiles
+
+| Method | Path | Description | Min role |
+|--------|------|-------------|----------|
+| GET | /style-profiles | List governed style profiles | Consumer |
+| POST | /style-profiles | Create a style profile and rules | Author |
+| POST | /prompts/{id}/style-profile/{profile_id} | Attach a profile to a workflow | Author |
+| POST | /style-check | Flag banned phrases and terminology in output | Consumer |
+
+---
+
 ## Audit
 
 | Method | Path | Description | Min role |

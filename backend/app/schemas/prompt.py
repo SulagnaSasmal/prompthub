@@ -14,6 +14,9 @@ class PromptCreate(BaseModel):
     target_model: str
     risk_level: str = "Medium"
     tags: List[str] = []
+    task_type: str = "General Writing"
+    usage_notes: str = ""
+    style_profile_id: UUID | None = None
 
 
 class PromptUpdate(BaseModel):
@@ -24,6 +27,9 @@ class PromptUpdate(BaseModel):
     target_model: str | None = None
     risk_level: str | None = None
     tags: List[str] | None = None
+    task_type: str | None = None
+    usage_notes: str | None = None
+    style_profile_id: UUID | None = None
 
 
 class PromptOut(BaseModel):
@@ -38,6 +44,11 @@ class PromptOut(BaseModel):
     target_model: str
     risk_level: str
     tags: List[str]
+    task_type: str
+    usage_notes: str
+    style_profile_id: UUID | None
+    run_count: int
+    formal_quality_score: float | None = None
     created_by: UUID
     created_at: datetime
     updated_at: datetime

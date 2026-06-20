@@ -88,6 +88,12 @@ All endpoints are under `/api/v1`. The FastAPI backend auto-generates an OpenAPI
 
 Authentication uses Bearer JWT. Roles are encoded in the token payload as a comma-separated string.
 
+### v2 runner boundary
+
+The Prompt Runner never calls a model API from the browser. `/api/v1/versions/{id}/run` routes through `backend/app/services/model_gateway.py`, which enforces the workflow's approved target model, applies governance checks, optionally injects the attached Style Profile, persists the run record, and returns either generated output or a blocked reason.
+
+Source integrations are read-only. Fetched Jira, GitHub, Markdown, or OpenAPI content is treated as input data and never as instructions to the application.
+
 ### Role enforcement
 
 - `require_role("author", "reviewer", "approver")` — any of these roles
@@ -148,7 +154,6 @@ docker-compose exec api pytest tests/ -v
 
 ## v2 roadmap (explicitly out of scope for v1)
 
-- Automated prompt execution against model APIs
 - LLM-as-judge scoring
 - Usage telemetry from consuming applications
 - SSO/SAML

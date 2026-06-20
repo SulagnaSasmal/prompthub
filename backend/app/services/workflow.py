@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.models.version import Version
 from app.models.workflow_log import WorkflowLog
+from app.services.model_gateway import referenced_variables
 
 # Valid transitions: current_status -> allowed next statuses
 TRANSITIONS = {
@@ -96,6 +97,21 @@ def _check_governance(version: Version) -> list[str]:
     return errors
 
 
+def _check_runnable_contract(version: Version) -> list[str]:
+    errors = []
+    declared = {v.name for v in version.variables}
+    referenced = referenced_variables(version.prompt_text)
+    undeclared = sorted(referenced - declared)
+    unused = sorted(declared - referenced)
+    if undeclared:
+        errors.append(f"Prompt references undeclared variable(s): {', '.join(undeclared)}")
+    if unused:
+        errors.append(f"Declared variable(s) not used in prompt text: {', '.join(unused)}")
+    if not version.examples:
+        errors.append("At least one good input/output example is required before approval")
+    return errors
+
+
 def transition(
     version: Version,
     to_status: str,
@@ -131,6 +147,9 @@ def transition(
             raise HTTPException(status_code=400, detail=f"Missing required fields: {missing}")
 
     if to_status == "Approved":
+        runnable_errors = _check_runnable_contract(version)
+        if runnable_errors:
+            raise HTTPException(status_code=400, detail={"runnable_errors": runnable_errors})
         test_errors = _check_test_cases(version)
         if test_errors:
             raise HTTPException(status_code=400, detail={"test_errors": test_errors})

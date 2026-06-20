@@ -4,6 +4,37 @@ This guide covers everything a **Consumer** or **Author** needs to use PromptHub
 
 ---
 
+## v2 Working Library and Runner
+
+After sign-in, PromptHub opens to the **Working Library**. It shows governed writing workflows with Run as the primary action, plus trust status, task type, approved model, formal quality score, field usage signal, and run count.
+
+Use filters for category, lifecycle status, risk, and **Task type** such as Release Notes, API Summary, Migration Guide, KB Article, Tone Rewrite, Style Check, and Documentation Draft.
+
+To run a workflow:
+
+1. Open an Approved or Production workflow.
+2. Fill the input fields generated from the workflow's `{{template_variables}}`.
+3. Optionally fetch read-only source content from Markdown, GitHub, Jira, or OpenAPI.
+4. Click **Run**.
+5. Review the generated output in the result pane.
+6. Rate the output with structured tags.
+7. Save a strong output as an example or promote it to a test case.
+
+All runs go through the server-side model gateway. The browser never calls a public model API directly. Blocked PII or compliance attempts are logged with the reason.
+
+---
+
+## Style Profiles
+
+Style Profiles contain approved terminology, banned phrases, voice rules, and formatting conventions. Authors and reviewers can attach an approved profile to a workflow.
+
+- **Embedded instruction** applies the profile during a run so output is shaped before it returns.
+- **Style check** scans generated output and flags banned phrases or off-list terminology.
+
+Style Profiles are governed assets: owned, versioned, approved, and auditable.
+
+---
+
 ## Register and sign in {#register}
 
 1. Navigate to `/login`.
@@ -117,6 +148,8 @@ To compare any two versions:
 A prompt version is complete and ready for review when:
 
 - [ ] All required metadata fields are filled
+- [ ] Template variables match the tokens used in prompt text
+- [ ] At least one good input/output example exists
 - [ ] Prompt text is written to the standards in [Prompt Design Standards](prompt-design-standards.md)
 - [ ] Version number follows the scheme (X.0 major, X.Y minor)
 - [ ] Change summary clearly states what changed and why

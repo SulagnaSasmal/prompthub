@@ -20,6 +20,7 @@ def list_prompts(
     owner_id: Optional[UUID] = Query(None),
     tag: Optional[str] = Query(None),
     risk_level: Optional[str] = Query(None),
+    task_type: Optional[str] = Query(None),
     db: Session = Depends(get_db),
     _: User = Depends(get_current_user),
 ):
@@ -32,9 +33,11 @@ def list_prompts(
         q = q.filter(Prompt.owner_id == owner_id)
     if risk_level:
         q = q.filter(Prompt.risk_level == risk_level)
+    if task_type:
+        q = q.filter(Prompt.task_type == task_type)
     if tag:
         q = q.filter(Prompt.tags.contains([tag]))
-    return q.order_by(Prompt.updated_at.desc()).all()
+    return q.order_by(Prompt.run_count.desc(), Prompt.updated_at.desc()).all()
 
 
 @router.post("", response_model=PromptOut, status_code=status.HTTP_201_CREATED)
