@@ -134,6 +134,30 @@ export interface Comment {
   created_at: string;
 }
 
+export interface WebhookEndpoint {
+  webhook_id: string;
+  name: string;
+  url: string;
+  event_type: string;
+  is_active: boolean;
+  created_by: string;
+  created_at: string;
+}
+
+export interface WebhookDelivery {
+  delivery_id: string;
+  webhook_id: string;
+  event_type: string;
+  status: "Pending" | "Delivered" | "Failed";
+  attempt_count: number;
+  max_attempts: number;
+  next_retry_at?: string;
+  last_status_code?: number;
+  last_error?: string;
+  created_at: string;
+  delivered_at?: string;
+}
+
 export interface Version {
   version_id: string;
   prompt_id: string;

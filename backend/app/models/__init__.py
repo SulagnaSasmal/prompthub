@@ -6,6 +6,7 @@ from app.models.test_case import TestCase
 from app.models.governance import GovernanceCheck
 from app.models.workflow_log import WorkflowLog
 from app.models.workflow_v2 import Comment, Example, Run, RunRating, StyleProfile, StyleRule, Variable
+from app.models.webhook import WebhookDelivery, WebhookEndpoint
 
 __all__ = [
     "User",
@@ -22,4 +23,6 @@ __all__ = [
     "StyleProfile",
     "StyleRule",
     "Comment",
+    "WebhookEndpoint",
+    "WebhookDelivery",
 ]

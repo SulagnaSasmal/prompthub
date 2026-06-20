@@ -8,7 +8,7 @@ const nav = [
   { href: "/library", label: "Working Library" },
   { href: "/runs", label: "Run History" },
   { href: "/dashboard", label: "Dashboard" },
-  { href: "/prompts/new", label: "Admin" },
+  { href: "/admin", label: "Admin" },
 ];
 
 export function Sidebar() {

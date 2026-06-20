@@ -106,6 +106,16 @@ Results: **Pass**, **Flag** (acknowledged issue), **Fail** (hard block).
 
 ---
 
+## Deployment Webhooks
+
+Approvers can configure deployment webhooks from **Admin**. Active endpoints receive a signed `prompt.production_deployed` POST whenever a version moves from Approved to Production.
+
+Each payload includes prompt metadata, the production version, rendered template text, previous production version metadata, and a unified diff from the previous active version. Downstream systems should verify `X-PromptHub-Signature-256` with the endpoint secret before applying changes.
+
+Failed deliveries are stored with retry metadata. Use **Retry** for one delivery or **Retry due** to retry pending deliveries whose backoff window has elapsed.
+
+---
+
 ## Risk level management
 
 - All Compliance category prompts are automatically **High** risk.
