@@ -9,7 +9,8 @@ from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.core.database import get_db
-from app.dependencies import get_current_user, require_role
+from app.core.permissions import Capability
+from app.dependencies import get_current_user, require_capability, require_role
 from app.models.user import User
 from app.models.workflow_v2 import Run
 from app.models.workflow_v3 import (
@@ -50,7 +51,7 @@ router = APIRouter(prefix="/api/v1", tags=["workflows-v3"])
 def create_integration_connection(
     body: IntegrationConnectionIn,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_role("approver")),
+    current_user: User = Depends(require_capability(Capability.ADMIN_MANAGE)),
 ):
     connection = IntegrationConnection(
         provider=body.provider,
@@ -68,7 +69,7 @@ def create_integration_connection(
         target_type="integration_connection",
         target_id=connection.connection_id,
         actor_id=current_user.user_id,
-        payload={"provider": body.provider, "status": body.status},
+        payload={"provider": body.provider, "status": body.status, "secret_status": "configured" if body.secret else "not_set"},
     )
     db.commit()
     db.refresh(connection)
@@ -76,17 +77,17 @@ def create_integration_connection(
 
 
 @router.get("/integration-connections", response_model=list[IntegrationConnectionOut])
-def list_integration_connections(db: Session = Depends(get_db), _: User = Depends(require_role("approver"))):
+def list_integration_connections(db: Session = Depends(get_db), _: User = Depends(require_capability(Capability.ADMIN_MANAGE))):
     return [_connection_out(item) for item in db.query(IntegrationConnection).order_by(IntegrationConnection.created_at.desc()).all()]
 
 
 @router.get("/source-references", response_model=list[SourceReferenceOut])
-def list_source_references(db: Session = Depends(get_db), _: User = Depends(require_role("reviewer", "approver"))):
+def list_source_references(db: Session = Depends(get_db), _: User = Depends(require_capability(Capability.REVIEW_MANAGE))):
     return db.query(SourceReference).order_by(SourceReference.created_at.desc()).limit(200).all()
 
 
 @router.get("/export-events", response_model=list[ExportEventOut])
-def list_export_events(db: Session = Depends(get_db), _: User = Depends(require_role("reviewer", "approver"))):
+def list_export_events(db: Session = Depends(get_db), _: User = Depends(require_capability(Capability.REVIEW_MANAGE))):
     return db.query(ExportEvent).order_by(ExportEvent.created_at.desc()).limit(200).all()
 
 
@@ -201,7 +202,7 @@ def create_workflow_pack(
 def import_workflow_pack(
     body: WorkflowPackIn,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_role("approver")),
+    current_user: User = Depends(require_capability(Capability.ADMIN_MANAGE)),
 ):
     manifest = {
         **body.manifest_json,
@@ -233,7 +234,7 @@ def import_workflow_pack(
 
 
 @router.get("/model-providers", response_model=list[ModelProviderOut])
-def list_model_providers(db: Session = Depends(get_db), _: User = Depends(require_role("approver"))):
+def list_model_providers(db: Session = Depends(get_db), _: User = Depends(require_capability(Capability.ADMIN_MANAGE))):
     return [_provider_out(item) for item in db.query(ModelProvider).order_by(ModelProvider.created_at.desc()).all()]
 
 
@@ -241,7 +242,7 @@ def list_model_providers(db: Session = Depends(get_db), _: User = Depends(requir
 def create_model_provider(
     body: ModelProviderIn,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_role("approver")),
+    current_user: User = Depends(require_capability(Capability.ADMIN_MANAGE)),
 ):
     provider = ModelProvider(
         name=body.name,
@@ -260,7 +261,12 @@ def create_model_provider(
         target_type="model_provider",
         target_id=provider.provider_id,
         actor_id=current_user.user_id,
-        payload={"provider_type": body.provider_type, "model_name": body.model_name, "status": body.status},
+        payload={
+            "provider_type": body.provider_type,
+            "model_name": body.model_name,
+            "status": body.status,
+            "credential_status": "configured" if body.credentials else "not_set",
+        },
     )
     db.commit()
     db.refresh(provider)
@@ -268,7 +274,7 @@ def create_model_provider(
 
 
 @router.post("/model-providers/{provider_id}/test", response_model=ModelProviderTestOut)
-def test_model_provider(provider_id: UUID, db: Session = Depends(get_db), _: User = Depends(require_role("approver"))):
+def test_model_provider(provider_id: UUID, db: Session = Depends(get_db), _: User = Depends(require_capability(Capability.ADMIN_MANAGE))):
     provider = db.query(ModelProvider).filter(ModelProvider.provider_id == provider_id).first()
     if not provider:
         raise HTTPException(status_code=404, detail="Model provider not found")
@@ -283,12 +289,12 @@ def test_model_provider(provider_id: UUID, db: Session = Depends(get_db), _: Use
 
 
 @router.get("/audit-events", response_model=list[AuditEventOut])
-def list_audit_events(db: Session = Depends(get_db), _: User = Depends(require_role("approver"))):
+def list_audit_events(db: Session = Depends(get_db), _: User = Depends(require_capability(Capability.AUDIT_VIEW))):
     return db.query(AuditEvent).order_by(AuditEvent.created_at.desc()).limit(500).all()
 
 
 @router.get("/audit-events/export", response_class=PlainTextResponse)
-def export_audit_events(db: Session = Depends(get_db), _: User = Depends(require_role("approver"))):
+def export_audit_events(db: Session = Depends(get_db), _: User = Depends(require_capability(Capability.AUDIT_VIEW))):
     return PlainTextResponse(
         content=export_audit_events_csv(db),
         media_type="text/csv",
@@ -297,7 +303,7 @@ def export_audit_events(db: Session = Depends(get_db), _: User = Depends(require
 
 
 @router.get("/security/retention-policies", response_model=list[RetentionPolicyOut])
-def list_retention_policies(db: Session = Depends(get_db), _: User = Depends(require_role("approver"))):
+def list_retention_policies(db: Session = Depends(get_db), _: User = Depends(require_capability(Capability.SECURITY_MANAGE))):
     return db.query(RetentionPolicy).order_by(RetentionPolicy.created_at.desc()).all()
 
 
@@ -305,7 +311,7 @@ def list_retention_policies(db: Session = Depends(get_db), _: User = Depends(req
 def create_retention_policy(
     body: RetentionPolicyIn,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_role("approver")),
+    current_user: User = Depends(require_capability(Capability.SECURITY_MANAGE)),
 ):
     policy = RetentionPolicy(**body.model_dump(), created_by=current_user.user_id)
     db.add(policy)
@@ -323,7 +329,7 @@ def create_retention_policy(
 
 
 @router.get("/security/auth-configs", response_model=list[EnterpriseAuthConfigOut])
-def list_auth_configs(db: Session = Depends(get_db), _: User = Depends(require_role("approver"))):
+def list_auth_configs(db: Session = Depends(get_db), _: User = Depends(require_capability(Capability.SECURITY_MANAGE))):
     return [_auth_config_out(item) for item in db.query(EnterpriseAuthConfig).order_by(EnterpriseAuthConfig.created_at.desc()).all()]
 
 
@@ -331,7 +337,7 @@ def list_auth_configs(db: Session = Depends(get_db), _: User = Depends(require_r
 def create_auth_config(
     body: EnterpriseAuthConfigIn,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_role("approver")),
+    current_user: User = Depends(require_capability(Capability.SECURITY_MANAGE)),
 ):
     config = EnterpriseAuthConfig(
         provider_type=body.provider_type,
@@ -350,7 +356,11 @@ def create_auth_config(
         target_type="enterprise_auth_config",
         target_id=config.auth_config_id,
         actor_id=current_user.user_id,
-        payload={"provider_type": body.provider_type, "status": body.status},
+        payload={
+            "provider_type": body.provider_type,
+            "status": body.status,
+            "secret_status": "configured" if body.client_secret else "not_set",
+        },
     )
     db.commit()
     db.refresh(config)

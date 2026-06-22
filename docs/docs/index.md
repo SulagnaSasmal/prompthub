@@ -39,10 +39,11 @@
 
 ## Navigation
 
-- [User Guide](user-guide.md) — for Consumers and Authors
-- [Admin Guide](admin-guide.md) — for Reviewers and Approvers
-- [Prompt Design Standards](prompt-design-standards.md) — how to write excellent prompts
-- [Architecture](architecture.md) — for engineers integrating with PromptHub
-- [API Reference](api-reference.md) — all endpoints
+- [User Guide](user-guide.md) - for Consumers and Authors
+- [Admin Guide](admin-guide.md) - for Reviewers and Approvers
+- [Prompt Design Standards](prompt-design-standards.md) - how to write excellent prompts
+- [Architecture](architecture.md) - for engineers integrating with PromptHub
+- [API Reference](api-reference.md) - all endpoints
+- [Security and Privacy](security-privacy.md) - data inventory, roles, credentials, and retention expectations
 - [FAQ](faq.md)
 - [Release Notes](release-notes.md)

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import type { DeploymentSummary, WebhookDelivery } from "@/lib/types";
+import { AccessNotice } from "@/components/auth/AccessNotice";
 import { PageHelp } from "@/components/help/PageHelp";
 import { RotateCw, Rocket } from "lucide-react";
 
@@ -79,6 +80,12 @@ export default function DeploymentsPage() {
           Configure webhooks
         </Link>
       </div>
+
+      <AccessNotice
+        title="Deployment visibility"
+        allowedRoles={["admin", "approver"]}
+        description="Admins and approvers can monitor production workflow delivery and replay failed webhook deliveries."
+      />
 
       {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
       {message && <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{message}</p>}

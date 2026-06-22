@@ -4,7 +4,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.dependencies import require_role
+from app.core.permissions import Capability
+from app.dependencies import require_capability
 from app.models.user import User
 from app.models.webhook import WebhookDelivery, WebhookEndpoint
 from app.schemas.webhook import (
@@ -20,7 +21,7 @@ router = APIRouter(prefix="/api/v1/webhooks", tags=["webhooks"])
 
 
 @router.get("", response_model=list[WebhookEndpointOut])
-def list_webhooks(db: Session = Depends(get_db), _: User = Depends(require_role("approver"))):
+def list_webhooks(db: Session = Depends(get_db), _: User = Depends(require_capability(Capability.DEPLOYMENT_MANAGE))):
     return db.query(WebhookEndpoint).order_by(WebhookEndpoint.created_at.desc()).all()
 
 
@@ -28,7 +29,7 @@ def list_webhooks(db: Session = Depends(get_db), _: User = Depends(require_role(
 def create_webhook(
     body: WebhookEndpointCreate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_role("approver")),
+    current_user: User = Depends(require_capability(Capability.DEPLOYMENT_MANAGE)),
 ):
     endpoint = WebhookEndpoint(
         name=body.name,
@@ -58,7 +59,7 @@ def update_webhook(
     webhook_id: UUID,
     body: WebhookEndpointUpdate,
     db: Session = Depends(get_db),
-    _: User = Depends(require_role("approver")),
+    _: User = Depends(require_capability(Capability.DEPLOYMENT_MANAGE)),
 ):
     endpoint = db.query(WebhookEndpoint).filter(WebhookEndpoint.webhook_id == webhook_id).first()
     if not endpoint:
@@ -79,12 +80,12 @@ def update_webhook(
 
 
 @router.get("/deliveries", response_model=list[WebhookDeliveryOut])
-def list_deliveries(db: Session = Depends(get_db), _: User = Depends(require_role("approver"))):
+def list_deliveries(db: Session = Depends(get_db), _: User = Depends(require_capability(Capability.DEPLOYMENT_MANAGE))):
     return db.query(WebhookDelivery).order_by(WebhookDelivery.created_at.desc()).limit(100).all()
 
 
 @router.post("/deliveries/{delivery_id}/retry", response_model=WebhookDeliveryOut)
-def retry_delivery(delivery_id: UUID, db: Session = Depends(get_db), _: User = Depends(require_role("approver"))):
+def retry_delivery(delivery_id: UUID, db: Session = Depends(get_db), _: User = Depends(require_capability(Capability.DEPLOYMENT_MANAGE))):
     delivery = db.query(WebhookDelivery).filter(WebhookDelivery.delivery_id == delivery_id).first()
     if not delivery:
         raise HTTPException(status_code=404, detail="Webhook delivery not found")
@@ -103,5 +104,5 @@ def retry_delivery(delivery_id: UUID, db: Session = Depends(get_db), _: User = D
 
 
 @router.post("/retry-pending", response_model=list[WebhookDeliveryOut])
-def retry_pending(db: Session = Depends(get_db), _: User = Depends(require_role("approver"))):
+def retry_pending(db: Session = Depends(get_db), _: User = Depends(require_capability(Capability.DEPLOYMENT_MANAGE))):
     return retry_pending_deliveries(db)

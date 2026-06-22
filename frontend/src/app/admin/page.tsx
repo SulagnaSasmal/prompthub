@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import type { WebhookDelivery, WebhookEndpoint } from "@/lib/types";
+import { AccessNotice } from "@/components/auth/AccessNotice";
 import { PageHelp } from "@/components/help/PageHelp";
 import { RotateCw, Save, ToggleLeft, ToggleRight } from "lucide-react";
 
@@ -104,6 +105,12 @@ export default function AdminPage() {
           New workflow
         </Link>
       </div>
+
+      <AccessNotice
+        title="Deployment access"
+        allowedRoles={["admin", "approver"]}
+        description="Only admins and approvers can create deployment webhooks, pause endpoints, and retry webhook deliveries."
+      />
 
       {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
       {message && <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{message}</p>}

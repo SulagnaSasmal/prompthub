@@ -23,6 +23,7 @@ nav:
   - Prompt Design Standards: prompt-design-standards.md
   - Architecture: architecture.md
   - API Reference: api-reference.md
+  - Security and Privacy: security-privacy.md
   - GitHub Action: github-action.md
   - Testing Plan: testing-plan.md
   - FAQ: faq.md

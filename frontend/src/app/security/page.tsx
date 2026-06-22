@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import type { EnterpriseAuthConfig, RetentionPolicy } from "@/lib/types";
+import { AccessNotice } from "@/components/auth/AccessNotice";
 import { PageHelp } from "@/components/help/PageHelp";
 import { KeyRound, Save, Shield } from "lucide-react";
 
@@ -102,8 +103,23 @@ export default function SecurityPage() {
         <p className="mt-1 text-sm text-slate-500">Retention, private-source storage, and enterprise identity readiness.</p>
       </div>
 
+      <AccessNotice
+        title="Security admin access"
+        allowedRoles={["admin"]}
+        description="Only admins can manage retention policies, private source storage, and enterprise identity secrets."
+      />
+
       {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
       {message && <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{message}</p>}
+
+      <section className="rounded-lg border border-slate-200 bg-white p-5">
+        <h3 className="font-semibold text-slate-900">Data handling baseline</h3>
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
+          <BaselineItem title="Secrets" text="Raw webhook, provider, integration, and auth secrets are encrypted and never returned after save." />
+          <BaselineItem title="Audit payloads" text="Sensitive keys such as tokens, passwords, credentials, inputs, outputs, and content are redacted before storage." />
+          <BaselineItem title="Source storage" text="Reference-only storage is the recommended default for private source material." />
+        </div>
+      </section>
 
       <section className="grid gap-6 lg:grid-cols-2">
         <form onSubmit={savePolicy} className="rounded-lg border border-slate-200 bg-white p-5">
@@ -172,6 +188,15 @@ export default function SecurityPage() {
         <List title="Retention policies" items={policies.map((policy) => `${policy.name}: ${policy.retention_days} days, ${policy.private_source_storage}`)} />
         <List title="Enterprise auth configs" items={authConfigs.map((config) => `${config.name}: ${config.provider_type}, ${config.status}, secret ${config.secret_status || "not set"}`)} />
       </section>
+    </div>
+  );
+}
+
+function BaselineItem({ title, text }: { title: string; text: string }) {
+  return (
+    <div className="rounded-lg bg-slate-50 p-4">
+      <p className="font-medium text-slate-900">{title}</p>
+      <p className="mt-1 text-sm text-slate-600">{text}</p>
     </div>
   );
 }

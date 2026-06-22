@@ -1,4 +1,4 @@
-def _register_and_login(client, username="v3user", roles="author,reviewer,approver"):
+def _register_and_login(client, username="v3user", roles="admin,author,reviewer,approver"):
     client.post("/api/v1/auth/register", json={
         "username": username,
         "email": f"{username}@test.com",
@@ -162,3 +162,63 @@ def test_v3_integrations_review_queue_and_markdown_export(client):
     assert audit_resp.status_code == 200
     event_types = {event["event_type"] for event in audit_resp.json()}
     assert {"run.executed", "output.exported", "workflow_pack.imported"}.issubset(event_types)
+
+
+def test_admin_configuration_requires_admin_and_masks_secrets(client):
+    reviewer_token = _register_and_login(client, username="reviewer-no-admin", roles="reviewer")
+    admin_token = _register_and_login(client, username="admin-user", roles="admin")
+
+    denied = client.post("/api/v1/model-providers", headers=_headers(reviewer_token), json={
+        "name": "Denied provider",
+        "provider_type": "openai",
+        "model_name": "GPT-5",
+        "credentials": "should-not-save",
+    })
+    assert denied.status_code == 403
+    assert "Required capability" in denied.json()["detail"]
+
+    audit_resp = client.get("/api/v1/audit-events", headers=_headers(reviewer_token))
+    assert audit_resp.status_code == 200
+    assert any(event["event_type"] == "permission.denied" for event in audit_resp.json())
+
+    provider_resp = client.post("/api/v1/model-providers", headers=_headers(admin_token), json={
+        "name": "Masked provider",
+        "provider_type": "openai",
+        "model_name": "GPT-5",
+        "credentials": "secret-provider-key",
+    })
+    assert provider_resp.status_code == 201
+    assert provider_resp.json()["credential_status"] == "configured"
+    assert "secret-provider-key" not in str(provider_resp.json())
+
+    provider_list = client.get("/api/v1/model-providers", headers=_headers(admin_token))
+    assert provider_list.status_code == 200
+    assert provider_list.json()[0]["credential_status"] == "configured"
+    assert "secret-provider-key" not in str(provider_list.json())
+
+    auth_resp = client.post("/api/v1/security/auth-configs", headers=_headers(admin_token), json={
+        "provider_type": "oidc",
+        "name": "Masked OIDC",
+        "issuer_url": "https://idp.example.com",
+        "client_id": "prompthub",
+        "client_secret": "secret-client-value",
+    })
+    assert auth_resp.status_code == 201
+    assert auth_resp.json()["secret_status"] == "configured"
+    assert "secret-client-value" not in str(auth_resp.json())
+
+    connections_resp = client.post("/api/v1/integrations", headers=_headers(admin_token), json={
+        "provider": "github",
+        "name": "Masked GitHub",
+        "secret": "secret-github-token",
+    })
+    assert connections_resp.status_code == 201
+    assert connections_resp.json()["secret_status"] == "configured"
+    assert "secret-github-token" not in str(connections_resp.json())
+
+    audit_after_secret_changes = client.get("/api/v1/audit-events", headers=_headers(admin_token))
+    assert audit_after_secret_changes.status_code == 200
+    audit_text = str(audit_after_secret_changes.json())
+    assert "secret-provider-key" not in audit_text
+    assert "secret-client-value" not in audit_text
+    assert "secret-github-token" not in audit_text

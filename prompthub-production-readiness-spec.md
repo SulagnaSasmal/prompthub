@@ -85,32 +85,32 @@ Users should clearly understand what they can do, and the backend should enforce
 
 ### 3.4 Implementation Tickets
 
-- [ ] **RBAC-001: Define central permission matrix**
+- [x] **RBAC-001: Define central permission matrix**
   - Create a backend permission map for routes/actions.
   - Map roles to capabilities such as `workflow.run`, `workflow.create`, `version.approve`, `security.manage`.
   - Add tests for the permission map itself.
 
-- [ ] **RBAC-002: Enforce permissions on prompt/workflow routes**
+- [x] **RBAC-002: Enforce permissions on prompt/workflow routes**
   - Protect workflow creation, update, version creation, variable edits, examples, comments, and run actions.
   - Ensure consumers can run approved/production workflows but cannot edit them.
   - Add API tests for allowed and denied cases.
 
-- [ ] **RBAC-003: Enforce permissions on review and approval routes**
+- [x] **RBAC-003: Enforce permissions on review and approval routes**
   - Restrict evaluation, test result, governance check, and queue transition actions.
   - Restrict approval and production promotion to approver/admin roles.
   - Add tests for author-only, reviewer-only, and approver-only users.
 
-- [ ] **RBAC-004: Enforce admin/security permissions**
+- [x] **RBAC-004: Enforce admin/security permissions**
   - Restrict integrations, model providers, webhooks, retention policies, enterprise auth, and audit/security pages.
   - Ensure credential-related routes are admin-only.
   - Add tests for consumer, author, reviewer, approver, and admin access.
 
-- [ ] **RBAC-005: Add frontend access visibility**
+- [x] **RBAC-005: Add frontend access visibility**
   - Add access badges or panels on pages with restricted actions.
   - Show messages such as `Reviewer role required` or `Admin role required`.
   - Disable unavailable actions with clear tooltips or inline text.
 
-- [ ] **RBAC-006: Add permission-denied audit events**
+- [x] **RBAC-006: Add permission-denied audit events**
   - Record denied sensitive actions with actor, target, action, and timestamp.
   - Avoid logging raw credentials, source content, or prompt output in denial payloads.
 
@@ -156,32 +156,32 @@ PromptHub should make it clear what data is stored, how sensitive it is, how lon
 
 ### 4.4 Implementation Tickets
 
-- [ ] **SEC-001: Create formal data inventory**
+- [x] **SEC-001: Create formal data inventory**
   - Add a docs page listing stored data, sensitivity, retention, and owner.
   - Link the data inventory from the Security page and Help manual.
 
-- [ ] **SEC-002: Verify secret redaction across APIs**
+- [x] **SEC-002: Verify secret redaction across APIs**
   - Test webhooks, model providers, integrations, and enterprise auth list/detail endpoints.
   - Ensure responses return status like `secret saved`, not raw values.
   - Add regression tests.
 
-- [ ] **SEC-003: Add log redaction rules**
+- [x] **SEC-003: Add log redaction rules**
   - Redact authorization headers, secrets, reset tokens, credentials, and obvious API keys.
   - Confirm backend exception logs do not serialize full request bodies for sensitive routes.
 
-- [ ] **SEC-004: Implement or document retention behavior**
+- [x] **SEC-004: Implement or document retention behavior**
   - Define retention behavior for runs, exports, source references, and audit events.
   - If deletion jobs are not implemented yet, document the gap and add a scheduled-task ticket.
 
-- [ ] **SEC-005: Add source storage visibility**
+- [x] **SEC-005: Add source storage visibility**
   - Show current private source storage mode in Security and Integrations pages.
   - Explain what each mode stores.
 
-- [ ] **SEC-006: Add privacy-safe export auditing**
+- [x] **SEC-006: Add privacy-safe export auditing**
   - Ensure export/publish actions record target type, status, actor, and reference.
   - Avoid storing full exported content in audit payloads.
 
-- [ ] **SEC-007: Add security review checklist**
+- [x] **SEC-007: Add security review checklist**
   - Create a repeatable checklist for pre-release security review.
   - Include auth, secrets, logs, data retention, source storage, backups, and third-party integrations.
 
@@ -354,24 +354,24 @@ A new admin should be able to configure GitHub, Jira, OpenAPI, and model provide
 
 ### Phase 1: Access Control Foundation
 
-- [ ] RBAC-001
-- [ ] RBAC-002
-- [ ] RBAC-003
-- [ ] RBAC-004
-- [ ] RBAC-005
-- [ ] RBAC-006
+- [x] RBAC-001
+- [x] RBAC-002
+- [x] RBAC-003
+- [x] RBAC-004
+- [x] RBAC-005
+- [x] RBAC-006
 
 **Exit criteria:** All sensitive actions have backend permission checks, frontend access visibility, and API tests.
 
 ### Phase 2: Security and Privacy Baseline
 
-- [ ] SEC-001
-- [ ] SEC-002
-- [ ] SEC-003
-- [ ] SEC-004
-- [ ] SEC-005
-- [ ] SEC-006
-- [ ] SEC-007
+- [x] SEC-001
+- [x] SEC-002
+- [x] SEC-003
+- [x] SEC-004
+- [x] SEC-005
+- [x] SEC-006
+- [x] SEC-007
 
 **Exit criteria:** Data handling is documented, secrets are redacted, and retention behavior is visible.
 
@@ -425,4 +425,3 @@ Before publishing PromptHub beyond a controlled beta:
 - [ ] Which production host owns database backups: Railway, external Postgres provider, or a separate managed backup job?
 - [ ] Which error reporting provider should be used for frontend/backend exceptions?
 - [ ] Are GitHub/Jira integrations expected to use personal access tokens initially or app-based OAuth later?
-

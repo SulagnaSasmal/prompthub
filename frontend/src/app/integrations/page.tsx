@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import type { IntegrationCapability, IntegrationConnection, OpenApiDiff, SourceReference } from "@/lib/types";
+import { AccessNotice } from "@/components/auth/AccessNotice";
 import { PageHelp } from "@/components/help/PageHelp";
 import { Cable, Github, UploadCloud } from "lucide-react";
 
@@ -123,6 +124,12 @@ export default function IntegrationsPage() {
         </div>
         <p className="mt-1 text-sm text-slate-500">Read-only source inputs for workflow runs.</p>
       </div>
+
+      <AccessNotice
+        title="Integration access"
+        allowedRoles={["admin"]}
+        description="All signed-in users can fetch read-only source material, but only admins can save provider tokens, secrets, and reusable connections."
+      />
 
       {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
       {message && <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{message}</p>}

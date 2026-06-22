@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import type { ModelProvider } from "@/lib/types";
+import { AccessNotice } from "@/components/auth/AccessNotice";
 import { PageHelp } from "@/components/help/PageHelp";
 import { Cpu, Save } from "lucide-react";
 
@@ -83,6 +84,12 @@ export default function ModelProvidersPage() {
         </div>
         <p className="mt-1 text-sm text-slate-500">Server-side provider configuration for governed workflow execution.</p>
       </div>
+
+      <AccessNotice
+        title="Model provider admin access"
+        allowedRoles={["admin"]}
+        description="Only admins can add, view, or test model provider credentials. Workflow runs can still use the local gateway when no provider is configured."
+      />
 
       {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
       {message && <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{message}</p>}

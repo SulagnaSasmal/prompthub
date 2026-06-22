@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { api } from "@/lib/api";
 import type { ReviewQueueItem } from "@/lib/types";
+import { AccessNotice } from "@/components/auth/AccessNotice";
 import { PageHelp } from "@/components/help/PageHelp";
 import { AlertTriangle, CheckCircle2, ClipboardCheck } from "lucide-react";
 
@@ -114,6 +115,12 @@ export default function ReviewQueuePage() {
           {SECTIONS.map((name) => <option key={name}>{name}</option>)}
         </select>
       </div>
+
+      <AccessNotice
+        title="Review access"
+        allowedRoles={["admin", "reviewer", "approver"]}
+        description="Reviewers and approvers can manage review queue actions, tests, evaluations, and governance checks."
+      />
 
       <div className="grid gap-3 md:grid-cols-4">
         {SECTIONS.map((name) => (

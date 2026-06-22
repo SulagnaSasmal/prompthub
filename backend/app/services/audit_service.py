@@ -9,6 +9,7 @@ from app.models.workflow_log import WorkflowLog
 from app.models.user import User
 from app.models.version import Version
 from app.models.prompt import Prompt
+from app.services.redaction import redact_sensitive
 
 
 def record_audit_event(
@@ -25,7 +26,7 @@ def record_audit_event(
         event_type=event_type,
         target_type=target_type,
         target_id=target_id,
-        payload=payload or {},
+        payload=redact_sensitive(payload or {}),
     )
     db.add(event)
     return event

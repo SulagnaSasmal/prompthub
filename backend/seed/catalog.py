@@ -817,7 +817,7 @@ def seed():
         # Create users
         users = {}
         for role_set, name, email in [
-            ("author,reviewer,approver", "admin", "admin@prompthub.internal"),
+            ("admin,author,reviewer,approver", "admin", "admin@prompthub.internal"),
             ("author", "author1", "author1@prompthub.internal"),
             ("reviewer", "reviewer1", "reviewer1@prompthub.internal"),
             ("approver", "approver1", "approver1@prompthub.internal"),
